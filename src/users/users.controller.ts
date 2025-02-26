@@ -20,6 +20,7 @@ export class UsersController {
     @Post()
     create(@Body() data: Partial<UserDto>) {
         const userData = new UserDto(data)
+        // TODO: реализовать валидацию через class-validator, ValidationPipe
         console.log(data)
         console.log(userData)
         // return this.usersService.create(userDto)
