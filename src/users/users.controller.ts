@@ -21,6 +21,7 @@ export class UsersController {
     create(@Body() data: Partial<UserDto>) {
         const userData = new UserDto(data)
         // TODO: реализовать валидацию через class-validator, ValidationPipe
+        // https://dev.to/davidekete/understanding-data-transfer-objects-dto-and-data-validation-in-typescript-nestjs-1j2b
         console.log(data)
         console.log(userData)
         // return this.usersService.create(userDto)
