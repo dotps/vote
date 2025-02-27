@@ -1,4 +1,6 @@
 import {Body, Controller, Post} from "@nestjs/common"
+import {UserService} from "./user.service"
+import {User} from "./user.entity"
 
 export class UserDto {
     readonly id?: number
@@ -6,7 +8,7 @@ export class UserDto {
     readonly email?: string
     readonly password?: string
 
-    constructor(data: Partial<UserDto>) {
+    constructor(data: UserDto) {
         this.id = Number(data?.id) || undefined
         this.name = data?.name ? data.name.toString() : undefined
         this.email = data?.email ? data.email.toString() : undefined
@@ -15,16 +17,19 @@ export class UserDto {
 }
 
 @Controller("users")
-export class UsersController {
+export class UserController {
+
+    private readonly usersService: UserService
+
+    constructor(usersService: UserService) {
+        this.usersService = usersService
+    }
 
     @Post()
-    create(@Body() data: Partial<UserDto>) {
+    create(@Body() data: UserDto) {
         const userData = new UserDto(data)
         // TODO: реализовать валидацию через class-validator, ValidationPipe
         // https://dev.to/davidekete/understanding-data-transfer-objects-dto-and-data-validation-in-typescript-nestjs-1j2b
-        // TODO: подключить type orm
-        console.log(data)
-        console.log(userData)
-        // return this.usersService.create(userDto)
+        return this.usersService.create(userData)
     }
 }
