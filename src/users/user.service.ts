@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common"
+import {BadRequestException, Injectable, NotFoundException} from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import {Repository, UpdateResult} from "typeorm"
 import { User } from "./user.entity"
@@ -37,8 +37,9 @@ export class UserService {
         await this.repository.delete(id)
     }
 
-    async update(id: number, data: UserDto): Promise<boolean> {
+    async update(id: number, data: UserDto): Promise<User> {
         const result = await this.repository.update(id, data)
-        return result.affected ? true : false
+        if (!result.affected) throw new NotFoundException(`Запись с id=${id} не найдена.`)
+        return await this.get(id)
     }
 }

@@ -1,9 +1,7 @@
 import {Body, Controller, Param, ParseIntPipe, Post, Put, UsePipes, ValidationPipe} from "@nestjs/common"
 import {UserService} from "./user.service"
 import {User} from "./user.entity"
-import {CreateUserDto} from "./create-user.dto"
 import {UserDto} from "./user.dto"
-import {UpdateResult} from "typeorm"
 
 @Controller("users")
 export class UserController {
@@ -15,28 +13,31 @@ export class UserController {
     }
 
     @Post()
-    @UsePipes(new ValidationPipe({transform: true, whitelist: true}))
-    create(@Body() data: UserDto): Promise<User> {
+    @UsePipes(ValidationPipe)
+    async create(@Body() data: UserDto): Promise<User> {
         console.log(data)
-        return this.usersService.create(data)
+        return await this.usersService.create(data)
     }
 
+    // обновляет всю модель
     @Put(":id")
-    @UsePipes(new ValidationPipe({transform: true, whitelist: true}))
-    update(@Param("id", new ParseIntPipe()) id: number, @Body() data: UserDto): Promise<boolean> {
+    @UsePipes(ValidationPipe)
+    async update(@Param("id", ParseIntPipe) id: number, @Body() data: UserDto): Promise<User> {
         console.log(id)
         console.log(data)
-        const isUpdated = this.usersService.update(id, data)
-        return isUpdated
+        return await this.usersService.update(id, data)
     }
 
-    // TODO: реализовать CustomValidationPipe -> UserUpdatePipe
-    @Put("/v2/:id")
-    @UsePipes(new ValidationPipe({transform: true, whitelist: true}))
-    update2(@Param("id", new ParseIntPipe()) id: number, @Body() data: UserDto): Promise<boolean> {
+    // обновляет только переданные поля
+    // TODO: разобраться как можно реализовать обновление части полей в UserDto, ValidationType не работает с Partial<UserDto>
+    @Put(":id/custom")
+    @UsePipes(ValidationPipe)
+    async customUpdate(@Param("id", ParseIntPipe) id: number, @Body() data: UserDto): Promise<void> {
+        // TODO: попробовать plainToClass
+        // const validatedData = plainToClass(UserDto, data, { excludeExtraneousValues: true })
+        console.log("custom")
         console.log(id)
         console.log(data)
-        const isUpdated = this.usersService.update(id, data)
-        return isUpdated
+        // return await this.usersService.update(id, data)
     }
 }
