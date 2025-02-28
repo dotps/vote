@@ -30,5 +30,13 @@ export class UserController {
         return isUpdated
     }
 
-
+    // TODO: реализовать CustomValidationPipe -> UserUpdatePipe
+    @Put("/v2/:id")
+    @UsePipes(new ValidationPipe({transform: true, whitelist: true}))
+    update2(@Param("id", new ParseIntPipe()) id: number, @Body() data: UserDto): Promise<boolean> {
+        console.log(id)
+        console.log(data)
+        const isUpdated = this.usersService.update(id, data)
+        return isUpdated
+    }
 }
