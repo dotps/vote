@@ -1,20 +1,9 @@
-import {Body, Controller, Post} from "@nestjs/common"
+import {Body, Controller, Param, ParseIntPipe, Post, Put, UsePipes, ValidationPipe} from "@nestjs/common"
 import {UserService} from "./user.service"
 import {User} from "./user.entity"
-
-export class UserDto {
-    readonly id?: number
-    readonly name?: string
-    readonly email?: string
-    readonly password?: string
-
-    constructor(data: UserDto) {
-        this.id = Number(data?.id) || undefined
-        this.name = data?.name ? data.name.toString() : undefined
-        this.email = data?.email ? data.email.toString() : undefined
-        this.password = data?.password ? data.password.toString() : undefined
-    }
-}
+import {CreateUserDto} from "./create-user.dto"
+import {UserDto} from "./user.dto"
+import {UpdateResult} from "typeorm"
 
 @Controller("users")
 export class UserController {
@@ -26,10 +15,20 @@ export class UserController {
     }
 
     @Post()
-    create(@Body() data: UserDto) {
-        const userData = new UserDto(data)
-        // TODO: реализовать валидацию через class-validator, ValidationPipe
-        // https://dev.to/davidekete/understanding-data-transfer-objects-dto-and-data-validation-in-typescript-nestjs-1j2b
-        return this.usersService.create(userData)
+    @UsePipes(new ValidationPipe({transform: true, whitelist: true}))
+    create(@Body() data: UserDto): Promise<User> {
+        console.log(data)
+        return this.usersService.create(data)
     }
+
+    @Put(":id")
+    @UsePipes(new ValidationPipe({transform: true, whitelist: true}))
+    update(@Param("id", new ParseIntPipe()) id: number, @Body() data: UserDto): Promise<boolean> {
+        console.log(id)
+        console.log(data)
+        const isUpdated = this.usersService.update(id, data)
+        return isUpdated
+    }
+
+
 }
