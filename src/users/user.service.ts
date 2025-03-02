@@ -32,6 +32,10 @@ export class UserService {
         return this.repository.findOneBy({ id })
     }
 
+    async getUserByName(name: string): Promise<User | null> {
+        return this.repository.findOneBy({ name: name.trim() })
+    }
+
     async deleteUser(id: number): Promise<void> {
         const result = await this.repository.delete(id)
         if (!result.affected) throw new NotFoundException(`Запись с id=${id} не найдена.`)
