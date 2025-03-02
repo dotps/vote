@@ -1,15 +1,24 @@
-import {IsEmail, IsNotEmpty, IsString} from "class-validator"
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+
+export enum ValidationGroup {
+    CREATE = "CREATE",
+    UPDATE = "UPDATE",
+    PARTIAL_UPDATE = "PARTIAL_UPDATE",
+}
 
 export class UserDto {
-    @IsNotEmpty()
+    @IsNotEmpty({ groups: [ValidationGroup.CREATE, ValidationGroup.UPDATE] })
+    @IsOptional({ groups: [ValidationGroup.PARTIAL_UPDATE] })
     @IsString()
     readonly name: string
 
-    @IsNotEmpty()
+    @IsNotEmpty({ groups: [ValidationGroup.CREATE, ValidationGroup.UPDATE] })
+    @IsOptional({ groups: [ValidationGroup.PARTIAL_UPDATE] })
     @IsEmail()
     readonly email: string
 
-    @IsNotEmpty()
+    @IsNotEmpty({ groups: [ValidationGroup.CREATE, ValidationGroup.UPDATE] })
+    @IsOptional({ groups: [ValidationGroup.PARTIAL_UPDATE] })
     @IsString()
     readonly password: string
 }

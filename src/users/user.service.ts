@@ -2,7 +2,6 @@ import {BadRequestException, Injectable, NotFoundException} from "@nestjs/common
 import { InjectRepository } from "@nestjs/typeorm"
 import {Repository, UpdateResult} from "typeorm"
 import { User } from "./user.entity"
-import {CreateUserDto} from "./create-user.dto"
 import {UserDto} from "./user.dto"
 
 @Injectable()
@@ -20,7 +19,7 @@ export class UserService {
     //     this.userRepository = usersRepository
     // }
 
-    async create(user: CreateUserDto): Promise<User> {
+    async create(user: UserDto): Promise<User> {
         const newUser = this.repository.create(user)
         return await this.repository.save(newUser)
     }

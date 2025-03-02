@@ -1,43 +1,44 @@
-import {Body, Controller, Param, ParseIntPipe, Post, Put, UsePipes, ValidationPipe} from "@nestjs/common"
+import { Body, Controller, Param, ParseIntPipe, Patch, Post, Put, UsePipes, ValidationPipe } from '@nestjs/common';
 import {UserService} from "./user.service"
 import {User} from "./user.entity"
-import {UserDto} from "./user.dto"
+import { UserDto, ValidationGroup } from './user.dto';
+import { CustomUpdateUserDto } from './custom-update-user.dto';
 
 @Controller("users")
 export class UserController {
 
-    private readonly usersService: UserService
+    private readonly userService: UserService
 
     constructor(usersService: UserService) {
-        this.usersService = usersService
+        this.userService = usersService
     }
 
     @Post()
-    @UsePipes(ValidationPipe)
+    // @UsePipes(ValidationPipe)
+    @UsePipes(new ValidationPipe({ groups: [ValidationGroup.CREATE] }))
     async create(@Body() data: UserDto): Promise<User> {
         console.log(data)
-        return await this.usersService.create(data)
+        return await this.userService.create(data)
     }
 
     // обновляет всю модель
     @Put(":id")
-    @UsePipes(ValidationPipe)
+    // @UsePipes(new ValidationPipe({ groups: [ValidationGroup.UPDATE] }))
+    // @UsePipes(ValidationPipe)
+    // TODO: протестировать как будет работать в 2х вариантах UsePipes
     async update(@Param("id", ParseIntPipe) id: number, @Body() data: UserDto): Promise<User> {
         console.log(id)
         console.log(data)
-        return await this.usersService.update(id, data)
+        return await this.userService.update(id, data)
     }
 
     // обновляет только переданные поля
-    // TODO: разобраться как можно реализовать обновление части полей в UserDto, ValidationType не работает с Partial<UserDto>
-    @Put(":id/custom")
-    @UsePipes(ValidationPipe)
-    async customUpdate(@Param("id", ParseIntPipe) id: number, @Body() data: UserDto): Promise<void> {
-        // TODO: попробовать plainToClass
-        // const validatedData = plainToClass(UserDto, data, { excludeExtraneousValues: true })
+    @Patch(":id")
+    @UsePipes(new ValidationPipe({ groups: [ValidationGroup.PARTIAL_UPDATE] }))
+    async partialUpdate(@Param("id", ParseIntPipe) id: number, @Body() data: UserDto): Promise<void> {
         console.log("custom")
         console.log(id)
         console.log(data)
-        // return await this.usersService.update(id, data)
+        await this.userService.update(id, data)
     }
 }
