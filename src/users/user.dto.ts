@@ -7,6 +7,7 @@ export enum ValidationGroup {
 }
 
 export class UserDto {
+    // TODO: добавить группу для авторизации обязательно name и password
     @IsNotEmpty({ groups: [ValidationGroup.CREATE, ValidationGroup.UPDATE] })
     @IsOptional({ groups: [ValidationGroup.PARTIAL_UPDATE] })
     @IsString()

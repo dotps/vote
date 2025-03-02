@@ -1,7 +1,7 @@
-import {Body, Controller, Param, ParseIntPipe, Patch, Post, Put, UsePipes, ValidationPipe} from '@nestjs/common';
-import {UserService} from "./user.service"
-import {User} from "./user.entity"
-import {UserDto, ValidationGroup} from './user.dto';
+import { Body, Controller, Param, ParseIntPipe, Patch, Post, Put, UsePipes, ValidationPipe } from '@nestjs/common';
+import { UserService } from './user.service';
+import { User } from './user.entity';
+import { UserDto, ValidationGroup } from './user.dto';
 
 @Controller("users")
 export class UserController {
@@ -15,20 +15,21 @@ export class UserController {
     @Post()
     @UsePipes(new ValidationPipe({ groups: [ValidationGroup.CREATE] }))
     async create(@Body() data: UserDto): Promise<User> {
-        return await this.userService.create(data)
+        const user = await this.userService.createUser(data)
+        console.log(user.id);
+        return user
+        // return this.userService.createUser(data)
     }
 
-    // обновляет всю модель
     @Put(":id")
     @UsePipes(new ValidationPipe({ groups: [ValidationGroup.UPDATE] }))
     async update(@Param("id", ParseIntPipe) id: number, @Body() data: UserDto): Promise<User> {
-        return await this.userService.update(id, data)
+        return this.userService.updateUser(id, data)
     }
 
-    // обновляет только переданные поля
     @Patch(":id")
     @UsePipes(new ValidationPipe({ groups: [ValidationGroup.PARTIAL_UPDATE] }))
-    async partialUpdate(@Param("id", ParseIntPipe) id: number, @Body() data: UserDto): Promise<void> {
-        await this.userService.update(id, data)
+    async partialUpdate(@Param("id", ParseIntPipe) id: number, @Body() data: UserDto): Promise<User> {
+        return this.userService.updateUser(id, data)
     }
 }

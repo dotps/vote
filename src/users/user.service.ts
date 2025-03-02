@@ -19,7 +19,7 @@ export class UserService {
     //     this.userRepository = usersRepository
     // }
 
-    async create(user: UserDto): Promise<User> {
+    async createUser(user: UserDto): Promise<User> {
         const newUser = this.repository.create(user)
         return await this.repository.save(newUser)
     }
@@ -28,17 +28,18 @@ export class UserService {
         return this.repository.find()
     }
 
-    async get(id: number): Promise<User | null> {
+    async getUser(id: number): Promise<User | null> {
         return this.repository.findOneBy({ id })
     }
 
-    async delete(id: number): Promise<void> {
-        await this.repository.delete(id)
+    async deleteUser(id: number): Promise<void> {
+        const result = await this.repository.delete(id)
+        if (!result.affected) throw new NotFoundException(`Запись с id=${id} не найдена.`)
     }
 
-    async update(id: number, data: UserDto): Promise<User> {
+    async updateUser(id: number, data: UserDto): Promise<User> {
         const result = await this.repository.update(id, data)
         if (!result.affected) throw new NotFoundException(`Запись с id=${id} не найдена.`)
-        return await this.get(id)
+        return await this.getUser(id)
     }
 }
