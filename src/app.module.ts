@@ -8,6 +8,8 @@ import { AuthModule } from "./auth/auth.module"
 import { APP_GUARD } from "@nestjs/core"
 import { AuthGuard } from "./auth/auth.guard"
 
+// TODO: сделать модуль surveys
+
 @Module({
   imports: [
     configModule,
