@@ -1,7 +1,8 @@
-import { Body, Controller, Param, ParseIntPipe, Patch, Post, Put, UsePipes, ValidationPipe } from '@nestjs/common';
-import { UserService } from './user.service';
-import { User } from './user.entity';
-import { UserDto, ValidationGroup } from './user.dto';
+import { Body, Controller, Param, ParseIntPipe, Patch, Post, Put, UsePipes, ValidationPipe } from "@nestjs/common"
+import { UserService } from "./user.service"
+import { User } from "./user.entity"
+import { UserDto, ValidationGroup } from "./user.dto"
+import { Public } from "../auth/public.decorator"
 
 @Controller("users")
 export class UserController {
@@ -12,13 +13,11 @@ export class UserController {
         this.userService = usersService
     }
 
+    @Public()
     @Post()
     @UsePipes(new ValidationPipe({ groups: [ValidationGroup.CREATE] }))
     async create(@Body() data: UserDto): Promise<User> {
-        const user = await this.userService.createUser(data)
-        console.log(user.id);
-        return user
-        // return this.userService.createUser(data)
+        return await this.userService.createUser(data)
     }
 
     @Put(":id")

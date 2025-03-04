@@ -1,6 +1,8 @@
-import { Body, Controller, Post, HttpCode, HttpStatus, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Post, HttpCode, HttpStatus, UsePipes, ValidationPipe, Get, UseGuards, Request } from "@nestjs/common"
 import { AuthService } from "./auth.service"
-import { UserDto, ValidationGroup } from '../users/user.dto';
+import { UserDto, ValidationGroup } from "../users/user.dto"
+import { AuthGuard } from "./auth.guard"
+import { Public } from "./public.decorator"
 
 @Controller("auth")
 export class AuthController {
@@ -11,11 +13,17 @@ export class AuthController {
     this.authService = authService
   }
 
+  @Public()
   @HttpCode(HttpStatus.OK)
   @Post("login")
   @UsePipes(new ValidationPipe({ groups: [ValidationGroup.AUTH] }))
   signIn(@Body() user: UserDto) {
-    console.log(user)
     return this.authService.signIn(user.name, user.password)
+  }
+
+  // @UseGuards(AuthGuard)
+  @Get("profile")
+  getProfile(@Request() request) {
+    return request.user
   }
 }
