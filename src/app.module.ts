@@ -7,6 +7,7 @@ import { UserModule } from "./users/user.module"
 import { AuthModule } from "./auth/auth.module"
 import { APP_GUARD } from "@nestjs/core"
 import { AuthGuard } from "./auth/auth.guard"
+import { SurveysModule } from './surveys/surveys.module';
 
 // TODO: сделать модуль surveys
 
@@ -16,6 +17,7 @@ import { AuthGuard } from "./auth/auth.guard"
     databaseProvider,
     AuthModule,
     UserModule,
+    SurveysModule,
   ],
   controllers: [AppController],
   providers: [
