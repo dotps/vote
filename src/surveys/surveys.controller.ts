@@ -3,6 +3,7 @@ import {SurveysService} from "./surveys.service"
 import {AnswerDto, SurveyDto} from "./surveys.dto"
 import {Public} from "../auth/public.decorator"
 import {UserDto, ValidationGroup} from "../users/user.dto"
+import { Survey } from "./survey.entity"
 
 /*
 {
@@ -33,9 +34,8 @@ export class SurveysController {
     @Post()
     // @UsePipes(new ValidationPipe({ groups: [ValidationGroup.CREATE] }))
     @UsePipes(ValidationPipe)
-    async create(@Body() data: SurveyDto): Promise<void> {
+    async create(@Body() data: SurveyDto): Promise<Survey> {
         console.log(data)
-
-        // return await this.surveysService.createSurvey(data)
+        return await this.surveysService.createSurvey(data)
     }
 }

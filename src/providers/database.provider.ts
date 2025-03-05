@@ -1,17 +1,17 @@
-import {TypeOrmModule} from "@nestjs/typeorm"
-import {ConfigService} from "@nestjs/config"
-import {User} from "../users/user.entity"
-import { Config } from '../config/config';
+import { TypeOrmModule } from "@nestjs/typeorm"
+import { ConfigService } from "@nestjs/config"
+import { User } from "../users/user.entity"
+import { Config } from "../config/config"
+import { Survey } from "../surveys/survey.entity"
+import { Question } from "../surveys/question.entity"
+import { Answer } from "../surveys/answer.entity"
 
 export const databaseProvider = TypeOrmModule.forRootAsync({
-    useFactory: (configService: ConfigService) => ({
-        type: "postgres",
-        url: configService.get<string>(Config.DATABASE_URL),
-        entities: [User],
-        synchronize: true,
-    }),
-    inject: [ConfigService],
+  useFactory: (configService: ConfigService) => ({
+    type: "postgres",
+    url: configService.get<string>(Config.DATABASE_URL),
+    entities: [User, Survey, Question, Answer],
+    synchronize: true,
+  }),
+  inject: [ConfigService],
 })
-
-// TODO: продолжить
-// https://docs.nestjs.com/techniques/database
