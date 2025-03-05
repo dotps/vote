@@ -32,19 +32,39 @@ export class SurveysController {
     @Post()
     // @UsePipes(new ValidationPipe({ groups: [ValidationGroup.CREATE] }))
     @UsePipes(ValidationPipe)
-    async create(@Body() data: SurveyDto): Promise<Survey> {
+    async createSurvey(@Body() data: SurveyDto): Promise<Survey> {
         return await this.surveysService.createSurvey(data)
     }
 
     @Public() // TODO: убрать после завершения модуля
     @Get()
-    async getAll(): Promise<Survey[]> {
+    async getAllSurveys(): Promise<Survey[]> {
         return await this.surveysService.getAllSurveys()
     }
 
     @Public() // TODO: убрать после завершения модуля
     @Get(":id")
-    async get(@Param("id", ParseIntPipe) id: number): Promise<Survey> {
+    async getSurvey(@Param("id", ParseIntPipe) id: number): Promise<Survey> {
         return await this.surveysService.getSurvey(id)
+    }
+
+    @Public() // TODO: убрать после завершения модуля
+    @Post(":id")
+    async saveUserSurveyResponse(@Param("id", ParseIntPipe) id: number, @Body() data: any): Promise<void> {
+        console.log(id, data)
+        // TODO: продолжить
+        // return await this.surveysService.saveUserSurveyResponse(id, data)
+        /*
+        {
+            "questions": [
+                {
+                    "id": 1,
+                    "answers": [
+                        { id: 1 },
+                        { id: 2 },
+                    ]
+                }
+        }
+        */
     }
 }
