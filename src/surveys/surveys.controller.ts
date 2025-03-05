@@ -1,9 +1,20 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Post, UsePipes, ValidationPipe} from "@nestjs/common"
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Get,
+    Param,
+    ParseIntPipe,
+    Post,
+    UsePipes,
+    ValidationPipe,
+} from "@nestjs/common"
 import {SurveysService} from "./surveys.service"
-import {AnswerDto, SurveyDto} from "./surveys.dto"
+import { AnswerDto, QuestionDto, SurveyDto } from "./surveys.dto"
 import {Public} from "../auth/public.decorator"
-import {UserDto, ValidationGroup} from "../users/user.dto"
+import {UserDto} from "../users/user.dto"
 import { Survey } from "./survey.entity"
+import { ValidationGroup } from "../ValidationGroup"
 
 /*
 {
@@ -31,8 +42,10 @@ export class SurveysController {
     @Public() // TODO: убрать после завершения модуля
     @Post()
     // @UsePipes(new ValidationPipe({ groups: [ValidationGroup.CREATE] }))
-    @UsePipes(ValidationPipe)
+    // @UsePipes(ValidationPipe)
     async createSurvey(@Body() data: SurveyDto): Promise<Survey> {
+        console.log("createSurvey")
+        console.log(data)
         return await this.surveysService.createSurvey(data)
     }
 
@@ -50,8 +63,11 @@ export class SurveysController {
 
     @Public() // TODO: убрать после завершения модуля
     @Post(":id")
-    async saveUserSurveyResponse(@Param("id", ParseIntPipe) id: number, @Body() data: any): Promise<void> {
+    @UsePipes(new ValidationPipe({ groups: [ValidationGroup.SURVEY_SAVE_RESPONSE] }))
+    // async saveUserSurveyResponse(@Param("id", ParseIntPipe) id: number, @Body() data: QuestionDto): Promise<any> {
+    async saveUserSurveyResponse(@Param("id", ParseIntPipe) id: number, @Body() data: SurveyDto): Promise<any> {
         console.log(id, data)
+        return data
         // TODO: продолжить
         // return await this.surveysService.saveUserSurveyResponse(id, data)
         /*

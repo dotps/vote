@@ -1,8 +1,9 @@
 import { Body, Controller, Param, ParseIntPipe, Patch, Post, Put, UsePipes, ValidationPipe } from "@nestjs/common"
 import { UserService } from "./user.service"
 import { User } from "./user.entity"
-import { UserDto, ValidationGroup } from "./user.dto"
+import { UserDto } from "./user.dto"
 import { Public } from "../auth/public.decorator"
+import { ValidationGroup } from "../ValidationGroup"
 
 @Controller("users")
 export class UserController {

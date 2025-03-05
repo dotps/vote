@@ -1,12 +1,6 @@
-import { IsEmail, IsEmpty, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { RemoveFromGroups } from './remove-from-groups.transformer';
-
-export enum ValidationGroup {
-    AUTH = "AUTH",
-    CREATE = "CREATE",
-    UPDATE = "UPDATE",
-    PARTIAL_UPDATE = "PARTIAL_UPDATE",
-}
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator"
+import { RemoveFromGroups } from "./remove-from-groups.transformer"
+import { ValidationGroup } from "../ValidationGroup"
 
 export class UserDto {
     @IsNotEmpty({ groups: [ValidationGroup.CREATE, ValidationGroup.UPDATE, ValidationGroup.AUTH] })
