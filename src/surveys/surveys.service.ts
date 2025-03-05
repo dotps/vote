@@ -17,9 +17,18 @@ export class SurveysService {
         return await this.repository.save(survey)
     }
 
-    async getAll(): Promise<Survey[]> {
+    async getAllSurveys(): Promise<Survey[]> {
         const surveys = await this.repository.find()
         if (surveys.length === 0) throw new NotFoundException()
-        return await this.repository.find()
+        return surveys
+    }
+
+    async getSurvey(id: number): Promise<Survey> {
+        const survey = await this.repository.findOne({
+            where: { id: id },
+            relations: ['questions', 'questions.answers']
+        })
+        if (!survey) throw new NotFoundException()
+        return survey
     }
 }

@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Post, UsePipes, ValidationPipe} from '@nestjs/common';
+import {Body, Controller, Get, Param, ParseIntPipe, Post, UsePipes, ValidationPipe} from "@nestjs/common"
 import {SurveysService} from "./surveys.service"
 import {AnswerDto, SurveyDto} from "./surveys.dto"
 import {Public} from "../auth/public.decorator"
@@ -39,6 +39,12 @@ export class SurveysController {
     @Public() // TODO: убрать после завершения модуля
     @Get()
     async getAll(): Promise<Survey[]> {
-        return await this.surveysService.getAll()
+        return await this.surveysService.getAllSurveys()
+    }
+
+    @Public() // TODO: убрать после завершения модуля
+    @Get(":id")
+    async get(@Param("id", ParseIntPipe) id: number): Promise<Survey> {
+        return await this.surveysService.getSurvey(id)
     }
 }
