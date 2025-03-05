@@ -32,7 +32,7 @@ export class SurveysController {
     @Public() // TODO: убрать после завершения модуля
     @Post()
     // @UsePipes(new ValidationPipe({ groups: [ValidationGroup.CREATE] }))
-    // @UsePipes(ValidationPipe)
+    @UsePipes(ValidationPipe)
     async create(@Body() data: SurveyDto): Promise<void> {
         console.log(data)
 
