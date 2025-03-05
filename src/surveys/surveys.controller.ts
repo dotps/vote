@@ -41,7 +41,7 @@ export class SurveysController {
 
     @Public() // TODO: убрать после завершения модуля
     @Post()
-    // @UsePipes(new ValidationPipe({ groups: [ValidationGroup.CREATE] }))
+    @UsePipes(new ValidationPipe({ groups: [ValidationGroup.CREATE] }))
     // @UsePipes(ValidationPipe)
     async createSurvey(@Body() data: SurveyDto): Promise<Survey> {
         console.log("createSurvey")
@@ -66,7 +66,7 @@ export class SurveysController {
     @UsePipes(new ValidationPipe({ groups: [ValidationGroup.SURVEY_SAVE_RESPONSE] }))
     // async saveUserSurveyResponse(@Param("id", ParseIntPipe) id: number, @Body() data: QuestionDto): Promise<any> {
     async saveUserSurveyResponse(@Param("id", ParseIntPipe) id: number, @Body() data: SurveyDto): Promise<any> {
-        console.log(id, data)
+        // console.log(id, data)
         return data
         // TODO: продолжить
         // return await this.surveysService.saveUserSurveyResponse(id, data)

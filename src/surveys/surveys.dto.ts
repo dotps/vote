@@ -5,13 +5,20 @@ import { ValidationGroup } from "../ValidationGroup"
 
 export class SurveyDto {
 
+    // TODO: RemoveFromGroups не работает
+
+    @RemoveFromGroups([ValidationGroup.AUTH])
     // @RemoveFromGroups([ValidationGroup.SURVEY_SAVE_RESPONSE])
-    // @IsNotEmpty({ groups: [ValidationGroup.CREATE] })
-    @IsString()
+    // @IsOptional({ groups: [ValidationGroup.SURVEY_SAVE_RESPONSE] })
+
+    @IsNotEmpty({ groups: [ValidationGroup.CREATE] })
+    @IsString({ groups: [ValidationGroup.CREATE] })
     readonly title: string
 
+    // TODO: еще раз попробовать сделать через группы
+
     // @RemoveFromGroups([ValidationGroup.SURVEY_SAVE_RESPONSE])
-    // @IsNotEmpty({ groups: [ValidationGroup.CREATE] })
+    @IsNotEmpty({ groups: [ValidationGroup.CREATE] })
     @IsString()
     readonly description: string
 
@@ -21,14 +28,19 @@ export class SurveyDto {
     readonly questions: QuestionDto[]
 }
 
+export class SurveyWithIdDto extends SurveyDto {
+    declare readonly questions: QuestionDto[]
+}
+
 export class QuestionDto {
 
-    @RemoveFromGroups([ValidationGroup.CREATE])
+    // @RemoveFromGroups([ValidationGroup.CREATE])
     // @IsNotEmpty({ groups: [ValidationGroup.SURVEY_SAVE_RESPONSE] })
     // @IsInt({ groups: [ValidationGroup.SURVEY_SAVE_RESPONSE] })
-    readonly id: number
+    // readonly id: number
 
-    @RemoveFromGroups([ValidationGroup.SURVEY_SAVE_RESPONSE])
+    // @RemoveFromGroups([ValidationGroup.SURVEY_SAVE_RESPONSE])
+    @IsNotEmpty({ groups: [ValidationGroup.CREATE] })
     @IsString()
     readonly title: string
 
@@ -48,7 +60,13 @@ export class AnswerDto {
     // readonly id?: number
 
     // @RemoveFromGroups([ValidationGroup.SURVEY_SAVE_RESPONSE])
-    // @IsNotEmpty({ groups: [ValidationGroup.CREATE] })
+    @IsNotEmpty({ groups: [ValidationGroup.CREATE] })
     @IsString()
     readonly title: string
 }
+
+// export class AnswerDto2 extends AnswerDto{
+//     @IsString()
+//     readonly title: string
+//
+// }
