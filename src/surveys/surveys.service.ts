@@ -1,8 +1,8 @@
 import {Injectable, NotFoundException} from "@nestjs/common"
-import {SurveyDto} from "./surveys.dto"
 import {InjectRepository} from "@nestjs/typeorm"
 import {Repository} from "typeorm"
 import {Survey} from "./survey.entity"
+import {CreateSurveyDto} from "./create-survey.dto"
 
 @Injectable()
 export class SurveysService {
@@ -12,7 +12,7 @@ export class SurveysService {
         private readonly repository: Repository<Survey>,
     ) {}
 
-    async createSurvey(data: SurveyDto): Promise<Survey> {
+    async createSurvey(data: CreateSurveyDto): Promise<Survey> {
         const survey = this.repository.create(data)
         return await this.repository.save(survey)
     }
