@@ -5,12 +5,13 @@ import { Config } from "../config/config"
 import { Survey } from "../surveys/survey.entity"
 import { Question } from "../surveys/question.entity"
 import { Answer } from "../surveys/answer.entity"
+import { SurveyResponses } from "../surveys/survey-responses.entity"
 
 export const databaseProvider = TypeOrmModule.forRootAsync({
   useFactory: (configService: ConfigService) => ({
     type: "postgres",
     url: configService.get<string>(Config.DATABASE_URL),
-    entities: [User, Survey, Question, Answer],
+    entities: [User, Survey, Question, Answer, SurveyResponses],
     synchronize: true,
   }),
   inject: [ConfigService],

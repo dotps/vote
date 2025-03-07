@@ -4,6 +4,7 @@ import {Public} from "../auth/public.decorator"
 import {Survey} from "./survey.entity"
 import {SaveSurveyResponseDto} from "./save-survey-response.dto"
 import {CreateSurveyDto} from "./create-survey.dto"
+import { SurveyResponses } from "./survey-responses.entity"
 
 @Controller("surveys")
 export class SurveysController {
@@ -37,7 +38,7 @@ export class SurveysController {
         @Param("id", ParseIntPipe) id: number,
         @Body() data: SaveSurveyResponseDto,
         @Request() request
-    ): Promise<Survey> {
+    ): Promise<SurveyResponses[]> {
         // const userId = request.user.id
         const userId = 1
         return await this.surveysService.saveUserSurveyResponse(userId, id, data)

@@ -10,10 +10,10 @@ import {SurveyResponses} from "./survey-responses.entity"
 export class SurveysService {
 
     constructor(
-        @InjectRepository(Survey)
-        // @InjectRepository(SurveyResponses)
-        private readonly surveyRepository: Repository<Survey>,
-        // private readonly responseRepository: Repository<SurveyResponses>,
+      @InjectRepository(Survey)
+      private readonly surveyRepository: Repository<Survey>,
+      @InjectRepository(SurveyResponses)
+      private readonly responseRepository: Repository<SurveyResponses>,
     ) {}
 
     async createSurvey(data: CreateSurveyDto): Promise<Survey> {
@@ -36,33 +36,31 @@ export class SurveysService {
         return survey
     }
 
-    async saveUserSurveyResponse(userId: number, surveyId: number, data: SaveSurveyResponseDto): Promise<Survey> {
-        console.log(userId)
-        console.log(data)
-
+    async saveUserSurveyResponse(userId: number, surveyId: number, data: SaveSurveyResponseDto): Promise<SurveyResponses[]> {
         if (data.questions.length === 0) throw new BadRequestException() // TODO: можно ли через ValidationPipe проверить количество?
+
+        const saveResults: SurveyResponses[] = []
         for (const question of data.questions) {
             // question.id - есть ли в БД?
-            console.log(question)
             if (question.answers.length === 0) throw new BadRequestException()
+
             for (const answer of question.answers) {
-                console.log(answer.id)
                 // answer.id - есть ли в БД?
+                const surveyResponse = this.responseRepository.create({
+                    surveyId: surveyId,
+                    userId: userId,
+                    questionId: question.id,
+                    answerId: answer.id,
+                })
+                try {
+                    const result = await this.responseRepository.save(surveyResponse)
+                    saveResults.push(result)
+                }
+                catch (error) {
 
-                const surveyResponse = new SurveyResponses()
-                surveyResponse.surveyId = surveyId
-                // surveyResponse.userId = userId
-                surveyResponse.questionId = question.id
-                surveyResponse.answerId = answer.id
-                // TODO: продолжить
-                console.log(surveyResponse)
-                // await surveyResponse.save()
-
+                }
             }
         }
-        // TODO: сохранить в SurveyResponses
-        // data.questions
-        // return await this.repository.save(data)
-        return undefined
+        return saveResults
     }
 }
