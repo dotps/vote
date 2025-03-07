@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm"
 import { Question } from "./question.entity"
+import {SurveyResult} from "./survey-result.entity"
 
 @Entity()
 export class Survey {
@@ -22,4 +23,7 @@ export class Survey {
 
   @UpdateDateColumn()
   updatedAt: Date
+
+  @OneToMany(() => SurveyResult, (result) => result.survey)
+  results: SurveyResult[]
 }

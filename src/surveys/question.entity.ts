@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from "typeorm"
 import { Survey } from "./survey.entity"
 import { Answer } from "./answer.entity"
+import {SurveyResult} from "./survey-result.entity"
 
 @Entity()
 export class Question {
@@ -17,4 +18,7 @@ export class Question {
     cascade: true,
   })
   answers: Answer[]
+
+  @OneToMany(() => SurveyResult, (result) => result.question)
+  results: SurveyResult[]
 }
