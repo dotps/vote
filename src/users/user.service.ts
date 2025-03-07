@@ -20,6 +20,7 @@ export class UserService {
     async createUser(data: UserDto): Promise<AuthDto> {
         let user = this.repository.create(data)
         user = await this.repository.save(user)
+        // TODO: здесь ошибка
         const token = await this.tokenService.generateToken(user)
         return new AuthDto(user, token)
         // return
