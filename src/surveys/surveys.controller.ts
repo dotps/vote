@@ -2,9 +2,9 @@ import {Body, Controller, Get, Param, ParseIntPipe, Post, Request, UsePipes, Val
 import {SurveysService} from "./surveys.service"
 import {Public} from "../auth/public.decorator"
 import {Survey} from "./survey.entity"
-import {SaveSurveyResponseDto} from "./save-survey-response.dto"
+import {SaveSurveyResultDto} from "./save-survey-result.dto"
 import {CreateSurveyDto} from "./create-survey.dto"
-import { SurveyResponses } from "./survey-responses.entity"
+import { SurveyResult } from "./survey-result.entity"
 
 @Controller("surveys")
 export class SurveysController {
@@ -36,11 +36,11 @@ export class SurveysController {
     @UsePipes(ValidationPipe)
     async saveUserSurveyResponse(
         @Param("id", ParseIntPipe) id: number,
-        @Body() data: SaveSurveyResponseDto,
+        @Body() data: SaveSurveyResultDto,
         @Request() request
-    ): Promise<SurveyResponses[]> {
+    ): Promise<SurveyResult[]> {
         // const userId = request.user.id
         const userId = 1
-        return await this.surveysService.saveUserSurveyResponse(userId, id, data)
+        return await this.surveysService.saveUserSurveyResult(userId, id, data)
     }
 }

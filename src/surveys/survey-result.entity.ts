@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 
 @Entity()
 @Unique(["userId", "surveyId", "questionId"]) // запрет на уровне БД для повторных ответов
-export class SurveyResponses {
+export class SurveyResult {
   @PrimaryGeneratedColumn()
   id: number
 

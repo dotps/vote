@@ -3,10 +3,10 @@ import { SurveysController } from './surveys.controller';
 import { SurveysService } from './surveys.service';
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { Survey } from "./survey.entity"
-import { SurveyResponses } from "./survey-responses.entity"
+import { SurveyResult } from "./survey-result.entity"
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Survey, SurveyResponses])],
+  imports: [TypeOrmModule.forFeature([Survey, SurveyResult])],
   controllers: [SurveysController],
   providers: [SurveysService]
 })
