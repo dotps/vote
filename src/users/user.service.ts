@@ -1,8 +1,11 @@
-import {BadRequestException, Injectable, NotFoundException} from "@nestjs/common"
+import {BadRequestException, Inject, Injectable, NotFoundException} from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import {Repository, UpdateResult} from "typeorm"
 import { User } from "./user.entity"
 import {UserDto} from "./user.dto"
+import {AuthService} from "../auth/auth.service"
+import {AuthDto} from "../auth/auth.dto"
+import {TokenService} from "../auth/token.service"
 
 @Injectable()
 export class UserService {
@@ -10,11 +13,16 @@ export class UserService {
     constructor(
         @InjectRepository(User)
         private readonly repository: Repository<User>,
+        // private readonly authService: AuthService
+        private readonly tokenService: TokenService
     ) {}
 
-    async createUser(user: UserDto): Promise<User> {
-        const newUser = this.repository.create(user)
-        return await this.repository.save(newUser)
+    async createUser(data: UserDto): Promise<AuthDto> {
+        let user = this.repository.create(data)
+        user = await this.repository.save(user)
+        const token = await this.tokenService.generateToken(user)
+        return new AuthDto(user, token)
+        // return
     }
 
     async getAll(): Promise<User[]> {

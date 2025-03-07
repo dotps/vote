@@ -4,20 +4,19 @@ import { User } from "./user.entity"
 import { UserDto } from "./user.dto"
 import { Public } from "../auth/public.decorator"
 import { ValidationGroup } from "../ValidationGroup"
+import {AuthService} from "../auth/auth.service"
+import {AuthDto} from "../auth/auth.dto"
 
 @Controller("users")
 export class UserController {
 
-    private readonly userService: UserService
-
-    constructor(usersService: UserService) {
-        this.userService = usersService
+    constructor(private readonly userService: UserService) {
     }
 
     @Public()
     @Post()
     @UsePipes(new ValidationPipe({ groups: [ValidationGroup.CREATE] }))
-    async create(@Body() data: UserDto): Promise<User> {
+    async create(@Body() data: UserDto): Promise<AuthDto> {
         // TODO: уйти от групп в сторону нескольких dto + интерфейсы для них, см. survey
         return await this.userService.createUser(data)
     }

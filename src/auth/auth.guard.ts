@@ -3,11 +3,13 @@ import { Request } from "express"
 import { AuthService } from "./auth.service"
 import { Reflector } from "@nestjs/core"
 import { IS_PUBLIC_KEY } from "./public.decorator"
+import {TokenService} from "./token.service"
 
 @Injectable()
 export class AuthGuard implements CanActivate {
 
-  constructor(private authService: AuthService, private reflector: Reflector) {}
+  // constructor(private authService: AuthService, private reflector: Reflector) {}
+  constructor(private tokenService: TokenService, private reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
 
@@ -22,7 +24,7 @@ export class AuthGuard implements CanActivate {
     if (!token) throw new UnauthorizedException()
 
     try {
-      request["user"] = await this.authService.verifyToken(token)
+      request["user"] = await this.tokenService.verifyToken(token)
     } catch {
       throw new UnauthorizedException()
     }

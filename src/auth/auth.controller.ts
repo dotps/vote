@@ -8,10 +8,7 @@ import { ValidationGroup } from "../ValidationGroup"
 @Controller("auth")
 export class AuthController {
 
-  private authService: AuthService
-
-  constructor(authService: AuthService) {
-    this.authService = authService
+  constructor(private readonly authService: AuthService) {
   }
 
   @Public()
@@ -22,7 +19,6 @@ export class AuthController {
     return this.authService.signIn(user.name, user.password)
   }
 
-  // @UseGuards(AuthGuard)
   @Get("profile")
   getProfile(@Request() request) {
     return request.user
