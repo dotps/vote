@@ -1,9 +1,10 @@
 import {Body, Controller, Get, Param, ParseIntPipe, Post, Request, UsePipes, ValidationPipe} from "@nestjs/common"
-import {SurveysService} from "./surveys.service"
+import { SurveyResultResponse, SurveysService } from "./surveys.service"
 import {Survey} from "./survey.entity"
 import {SaveSurveyResultDto} from "./save-survey-result.dto"
 import {CreateSurveyDto} from "./create-survey.dto"
 import {SurveyResult} from "./survey-result.entity"
+import { Public } from "../auth/public.decorator"
 
 @Controller("surveys")
 export class SurveysController {
@@ -25,6 +26,11 @@ export class SurveysController {
     @Get(":id")
     async getSurvey(@Param("id", ParseIntPipe) id: number): Promise<Survey> {
         return await this.surveysService.getSurvey(id)
+    }
+
+    @Get(":id/result")
+    async getSurveyResult(@Param("id", ParseIntPipe) id: number): Promise<SurveyResultResponse[]> {
+        return await this.surveysService.getSurveyResult(id)
     }
 
     @Post(":id")

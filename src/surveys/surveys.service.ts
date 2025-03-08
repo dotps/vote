@@ -62,4 +62,36 @@ export class SurveysService {
         }
         return saveResults
     }
+
+    async getSurveyResult(id: number): Promise<SurveyResultResponse[]> {
+        const results = await this.resultRepository
+          .createQueryBuilder("result")
+          .select("survey.title", "surveyTitle")
+          .addSelect("survey.id", "surveyId")
+          .addSelect("question.id", "questionId")
+          .addSelect("question.title", "questionTitle")
+          .addSelect("answer.id", "answerId")
+          .addSelect("answer.title", "answerTitle")
+          .addSelect("COUNT(result.id)", "answerCount")
+          .innerJoin("result.survey", "survey")
+          .innerJoin("result.question", "question")
+          .innerJoin("result.answer", "answer")
+          .where("result.surveyId = :surveyId", { surveyId: id })
+          .groupBy("survey.id, survey.title, question.id, question.Title, answer.id, answer.Title")
+          .orderBy("question.id, answer.id")
+          .getRawMany()
+
+        if (!results || results.length === 0) throw new NotFoundException()
+        return results as SurveyResultResponse[]
+    }
+}
+
+export type SurveyResultResponse = {
+    surveyId: number,
+    surveyTitle: string,
+    questionId: number,
+    questionTitle: string,
+    answerId: number,
+    answerTitle: string,
+    answerCount: number
 }
