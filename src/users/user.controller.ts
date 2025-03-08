@@ -17,6 +17,7 @@ export class UserController {
     @Post()
     @UsePipes(new ValidationPipe({ groups: [ValidationGroup.CREATE] }))
     async create(@Body() data: UserDto): Promise<AuthDto> {
+        // TODO: ValidationGroup заменить на несколько dto
         // TODO: уйти от групп в сторону нескольких dto + интерфейсы для них, см. survey
         return await this.userService.createUser(data)
     }

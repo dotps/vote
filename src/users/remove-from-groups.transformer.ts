@@ -1,16 +1,8 @@
 import { Transform, TransformationType } from "class-transformer"
-import { IsOptional } from "class-validator"
-
 
 export function RemoveFromGroups(groups: string[]) {
 
   return Transform(({ value, obj, type }) => {
-    console.log(groups)
-    console.log(value)
-    console.log(obj)
-    console.log(type)
-    console.log("=========")
-
     if (type === TransformationType.PLAIN_TO_CLASS) {
       // if (groups.length > 0 && !groups.some(group => obj?.groups?.includes(group))) return undefined
       if (groups.length > 0 && groups.some(group => obj?.groups?.includes(group))) return undefined
