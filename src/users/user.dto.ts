@@ -8,7 +8,7 @@ export class UserDto {
     @IsString()
     readonly name: string
 
-    @RemoveFromGroups([ValidationGroup.AUTH])
+    // @RemoveFromGroups([ValidationGroup.AUTH])
     @IsNotEmpty({ groups: [ValidationGroup.CREATE, ValidationGroup.UPDATE] })
     @IsOptional({ groups: [ValidationGroup.PARTIAL_UPDATE] })
     @IsEmail()

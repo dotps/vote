@@ -4,6 +4,7 @@ export function RemoveFromGroups(groups: string[]) {
 
   return Transform(({ value, obj, type }) => {
     if (type === TransformationType.PLAIN_TO_CLASS) {
+      console.log(obj.groups)
       // if (groups.length > 0 && !groups.some(group => obj?.groups?.includes(group))) return undefined
       if (groups.length > 0 && groups.some(group => obj?.groups?.includes(group))) return undefined
     }

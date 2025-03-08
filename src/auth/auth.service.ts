@@ -6,7 +6,6 @@ import {TokenService} from "./token.service"
 @Injectable()
 export class AuthService {
 
-  // constructor(private readonly userService: UserService, private readonly jwtService: JwtService) {
   constructor(private readonly userService: UserService, private readonly tokenService: TokenService) {
   }
 
@@ -16,16 +15,5 @@ export class AuthService {
     const token =  await this.tokenService.generateToken(user)
     return new AuthDto(user, token)
   }
-
-  // async verifyToken(token: string): Promise<any> {
-  //   return this.jwtService.verifyAsync(token)
-  // }
-  //
-  // async generateToken(user: User): Promise<string> {
-  //   const payload = { sub: user.id, username: user.name }
-  //   const token =  await this.jwtService.signAsync(payload)
-  //   if (!token) throw new UnauthorizedException()
-  //   return token
-  // }
 }
 
