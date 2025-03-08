@@ -8,7 +8,6 @@ import {TokenService} from "./token.service"
 @Injectable()
 export class AuthGuard implements CanActivate {
 
-  // constructor(private authService: AuthService, private reflector: Reflector) {}
   constructor(private tokenService: TokenService, private reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
