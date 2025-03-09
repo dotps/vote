@@ -6,8 +6,10 @@ import {TokenService} from "./token.service"
 @Injectable()
 export class AuthService {
 
-  constructor(private readonly userService: UserService, private readonly tokenService: TokenService) {
-  }
+  constructor(
+    private readonly userService: UserService,
+    private readonly tokenService: TokenService
+  ) {}
 
   async signIn(username: string, password: string): Promise<AuthDto> {
     const user = await this.userService.getUserByName(username)

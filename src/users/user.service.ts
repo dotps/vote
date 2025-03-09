@@ -1,4 +1,4 @@
-import {BadRequestException, Inject, Injectable, NotFoundException} from "@nestjs/common"
+import { BadRequestException, Inject, Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import {Repository, UpdateResult} from "typeorm"
 import { User } from "./user.entity"
@@ -31,7 +31,9 @@ export class UserService {
     }
 
     async getUser(id: number): Promise<User | null> {
-        return this.repository.findOneBy({ id })
+        const user = await this.repository.findOneBy({ id })
+        if (!user) throw new NotFoundException()
+        return user
     }
 
     async getUserByName(name: string): Promise<User | null> {

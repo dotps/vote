@@ -1,4 +1,15 @@
-import {Body, Controller, Get, Param, ParseIntPipe, Post, Request, UsePipes, ValidationPipe} from "@nestjs/common"
+import {
+    Body,
+    Controller,
+    Get,
+    Param,
+    ParseIntPipe,
+    Post,
+    Request,
+    UnauthorizedException,
+    UsePipes,
+    ValidationPipe,
+} from "@nestjs/common"
 import { SurveyResultResponse, SurveysService } from "./surveys.service"
 import {Survey} from "./survey.entity"
 import {SaveSurveyResultDto} from "./save-survey-result.dto"
@@ -40,8 +51,8 @@ export class SurveysController {
         @Body() data: SaveSurveyResultDto,
         @Request() request
     ): Promise<SurveyResult[]> {
-        // const userId = request.user.id
-        const userId = 1
+        const userId = request.user.id
+        console.log(userId)
         return await this.surveysService.saveUserSurveyResult(userId, id, data)
     }
 }
