@@ -4,6 +4,7 @@ import { Reflector } from "@nestjs/core"
 import { IS_PUBLIC_KEY } from "./public.decorator"
 import { TokenService } from "./token.service"
 import { UserService } from "../users/user.service"
+import { User } from "../users/user.entity"
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -23,7 +24,8 @@ export class AuthGuard implements CanActivate {
 
     try {
       const userId = await this.getUserIdFromToken(token)
-      request["user"] = await this.userService.getUser(userId)
+      request.user = await this.userService.getUser(userId)
+      // request["user"] = await this.userService.getUser(userId)
     } catch {
       throw new UnauthorizedException()
     }

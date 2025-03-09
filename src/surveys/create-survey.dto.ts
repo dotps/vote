@@ -1,4 +1,4 @@
-import {IsArray, IsNotEmpty, IsString, ValidateNested} from "class-validator"
+import { IsArray, IsInt, IsNotEmpty, IsString, ValidateNested } from "class-validator"
 import {Type} from "class-transformer"
 import {IAnswerDto, IQuestionDto, ISurveyDto} from "./survey.dto"
 
@@ -15,6 +15,10 @@ export class CreateSurveyDto implements ISurveyDto {
     @ValidateNested({ each: true })
     @Type(() => CreateQuestionDto)
     questions: CreateQuestionDto[]
+
+    // @IsNotEmpty()
+    // @IsInt()
+    // createdBy: number
 }
 
 export class CreateQuestionDto implements IQuestionDto {

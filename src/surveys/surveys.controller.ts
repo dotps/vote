@@ -5,17 +5,16 @@ import {
     Param,
     ParseIntPipe,
     Post,
+    Put,
     Request,
-    UnauthorizedException,
     UsePipes,
     ValidationPipe,
 } from "@nestjs/common"
 import { SurveyResultResponse, SurveysService } from "./surveys.service"
-import {Survey} from "./survey.entity"
-import {SaveSurveyResultDto} from "./save-survey-result.dto"
-import {CreateSurveyDto} from "./create-survey.dto"
-import {SurveyResult} from "./survey-result.entity"
-import { Public } from "../auth/public.decorator"
+import { Survey } from "./survey.entity"
+import { SaveSurveyResultDto } from "./save-survey-result.dto"
+import { CreateSurveyDto } from "./create-survey.dto"
+import { SurveyResult } from "./survey-result.entity"
 
 @Controller("surveys")
 export class SurveysController {
@@ -25,8 +24,9 @@ export class SurveysController {
 
     @Post()
     @UsePipes(ValidationPipe)
-    async createSurvey(@Body() data: CreateSurveyDto): Promise<Survey> {
-        return await this.surveysService.createSurvey(data)
+    async createSurvey(@Body() data: CreateSurveyDto, @Request() request: any): Promise<Survey> {
+        const userId = request.user.id // TODO: разобраться с типами, или сделать отдельный класс CurrentUser
+        return await this.surveysService.createSurvey(data, userId)
     }
 
     @Get()
@@ -46,13 +46,25 @@ export class SurveysController {
 
     @Post(":id")
     @UsePipes(ValidationPipe)
-    async saveUserSurveyResponse(
+    async saveSurveyResult(
         @Param("id", ParseIntPipe) id: number,
         @Body() data: SaveSurveyResultDto,
-        @Request() request
+        @Request() request: any
     ): Promise<SurveyResult[]> {
         const userId = request.user.id
-        console.log(userId)
         return await this.surveysService.saveUserSurveyResult(userId, id, data)
+    }
+
+    @Put(":id")
+    @UsePipes(ValidationPipe)
+    async updateSurvey(
+      @Param("id", ParseIntPipe) id: number,
+      @Body() data: CreateSurveyDto,
+      @Request() request: any
+    ): Promise<Survey> {
+        const userId = request.user.id // TODO: разобраться с типами, или сделать отдельный класс CurrentUser
+        console.log(userId)
+        // console.log(data)
+        return await this.surveysService.updateSurvey(data, userId, id)
     }
 }

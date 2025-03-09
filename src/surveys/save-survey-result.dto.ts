@@ -7,6 +7,7 @@ export class SaveSurveyResultDto implements ISurveyDto {
     @ValidateNested({each: true})
     @Type(() => SaveQuestionResultDto)
     questions: SaveQuestionResultDto[]
+    createdBy: number
 }
 
 export class SaveQuestionResultDto implements IQuestionDto {

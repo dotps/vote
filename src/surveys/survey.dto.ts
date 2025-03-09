@@ -2,6 +2,7 @@ export interface ISurveyDto {
     title?: string
     description?: string
     questions: IQuestionDto[]
+    // createdBy: number
 }
 
 export interface IQuestionDto {

@@ -6,6 +6,7 @@ import {CreateSurveyDto} from "./create-survey.dto"
 import {SaveSurveyResultDto} from "./save-survey-result.dto"
 import {SurveyResult} from "./survey-result.entity"
 import {DBError} from "../DBError"
+import { ISurveyDto } from "./survey.dto"
 
 @Injectable()
 export class SurveysService {
@@ -18,7 +19,8 @@ export class SurveysService {
     ) {
     }
 
-    async createSurvey(data: CreateSurveyDto): Promise<Survey> {
+    async createSurvey(data: CreateSurveyDto, userId: number): Promise<Survey> {
+        this.addCreatedByUser(data, userId)
         const survey = this.surveyRepository.create(data)
         return await this.surveyRepository.save(survey)
     }
@@ -34,7 +36,7 @@ export class SurveysService {
             where: {id: id},
             relations: ["questions", "questions.answers"],
         })
-        if (!survey) throw new NotFoundException()
+        if (!survey) throw new NotFoundException("Опрос не найден.")
         return survey
     }
 
@@ -83,6 +85,22 @@ export class SurveysService {
 
         if (!results || results.length === 0) throw new NotFoundException()
         return results as SurveyResultResponse[]
+    }
+
+    private addCreatedByUser(data: ISurveyDto, userId: number) {
+        data["createdBy"] = userId
+    }
+
+    async updateSurvey(data: CreateSurveyDto, userId: number, surveyId: number) {
+        const survey = await this.getSurvey(surveyId)
+
+        console.log(survey)
+        if (!survey || survey.createdBy !== userId) throw new NotFoundException()
+        Object.assign(survey, data)
+        console.log(survey)
+        return await this.surveyRepository.save(survey)
+        // TODO: через debug разораться с обновлением
+        // когда прилетает не корректный объект странно себя ведет
     }
 }
 
