@@ -13,7 +13,7 @@ import {
 import { SurveyResultResponse, SurveysService } from "./surveys.service"
 import { Survey } from "./survey.entity"
 import { SaveSurveyResultDto } from "./save-survey-result.dto"
-import { CreateSurveyDto } from "./create-survey.dto"
+import {CreateSurveyDto, UpdateAnswerDto, UpdateSurveyDto} from "./create-survey.dto"
 import { SurveyResult } from "./survey-result.entity"
 
 @Controller("surveys")
@@ -59,9 +59,9 @@ export class SurveysController {
     @UsePipes(ValidationPipe)
     async updateSurvey(
       @Param("id", ParseIntPipe) id: number,
-      @Body() data: CreateSurveyDto,
+      @Body() data: UpdateSurveyDto,
       @Request() request: any
-    ): Promise<Survey> {
+    ): Promise<void> {
         const userId = request.user.id // TODO: разобраться с типами, или сделать отдельный класс CurrentUser
         console.log(userId)
         // console.log(data)

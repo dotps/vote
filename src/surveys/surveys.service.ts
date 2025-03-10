@@ -2,11 +2,13 @@ import {BadRequestException, Injectable, NotFoundException} from "@nestjs/common
 import {InjectRepository} from "@nestjs/typeorm"
 import {Repository} from "typeorm"
 import {Survey} from "./survey.entity"
-import {CreateSurveyDto} from "./create-survey.dto"
+import {CreateSurveyDto, UpdateSurveyDto} from "./create-survey.dto"
 import {SaveSurveyResultDto} from "./save-survey-result.dto"
 import {SurveyResult} from "./survey-result.entity"
 import {DBError} from "../DBError"
-import { ISurveyDto } from "./survey.dto"
+import {ISurveyDto} from "./survey.dto"
+import {Question} from "./question.entity"
+import {Answer} from "./answer.entity"
 
 @Injectable()
 export class SurveysService {
@@ -67,21 +69,21 @@ export class SurveysService {
 
     async getSurveyResult(id: number): Promise<SurveyResultResponse[]> {
         const results = await this.resultRepository
-          .createQueryBuilder("result")
-          .select("survey.title", "surveyTitle")
-          .addSelect("survey.id", "surveyId")
-          .addSelect("question.id", "questionId")
-          .addSelect("question.title", "questionTitle")
-          .addSelect("answer.id", "answerId")
-          .addSelect("answer.title", "answerTitle")
-          .addSelect("COUNT(result.id)", "answerCount")
-          .innerJoin("result.survey", "survey")
-          .innerJoin("result.question", "question")
-          .innerJoin("result.answer", "answer")
-          .where("result.surveyId = :surveyId", { surveyId: id })
-          .groupBy("survey.id, survey.title, question.id, question.Title, answer.id, answer.Title")
-          .orderBy("question.id, answer.id")
-          .getRawMany()
+            .createQueryBuilder("result")
+            .select("survey.title", "surveyTitle")
+            .addSelect("survey.id", "surveyId")
+            .addSelect("question.id", "questionId")
+            .addSelect("question.title", "questionTitle")
+            .addSelect("answer.id", "answerId")
+            .addSelect("answer.title", "answerTitle")
+            .addSelect("COUNT(result.id)", "answerCount")
+            .innerJoin("result.survey", "survey")
+            .innerJoin("result.question", "question")
+            .innerJoin("result.answer", "answer")
+            .where("result.surveyId = :surveyId", {surveyId: id})
+            .groupBy("survey.id, survey.title, question.id, question.Title, answer.id, answer.Title")
+            .orderBy("question.id, answer.id")
+            .getRawMany()
 
         if (!results || results.length === 0) throw new NotFoundException()
         return results as SurveyResultResponse[]
@@ -91,17 +93,52 @@ export class SurveysService {
         data["createdBy"] = userId
     }
 
-    async updateSurvey(data: CreateSurveyDto, userId: number, surveyId: number) {
+    async updateSurvey(data: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
         const survey = await this.getSurvey(surveyId)
+        if (!survey || survey.createdBy !== userId) throw new NotFoundException()
+
+        console.log(data)
+
+        survey.title = data.title
+        survey.description = data.description
+
+        for (const questionDto of data.questions) {
+            let question: Question
+
+            if (questionDto.id) {
+                // TODO: продолжить
+                console.log(questionDto.id)
+                question = survey.questions.find(q => q.id === questionDto.id)
+                if (!question) throw new NotFoundException("Вопрос не найден")
+            } else {
+                question = new Question()
+                survey.questions.push(question)
+            }
+
+            question.title = questionDto.title
+            question.answers = []
+
+            for (const answerDto of questionDto.answers) {
+                let answer: Answer
+
+                if (answerDto.id) {
+                    console.log(answerDto.id)
+                    answer = question.answers.find(a => a.id === answerDto.id)
+                    if (!answer) throw new NotFoundException("Ответ не найден")
+                } else {
+                    answer = new Answer()
+                }
+
+                answer.title = answerDto.title
+                question.answers.push(answer)
+            }
+        }
 
         console.log(survey)
-        if (!survey || survey.createdBy !== userId) throw new NotFoundException()
-        Object.assign(survey, data)
-        console.log(survey)
-        return await this.surveyRepository.save(survey)
-        // TODO: через debug разораться с обновлением
-        // когда прилетает не корректный объект странно себя ведет
+
+        // return await this.surveyRepository.save(survey)
     }
+
 }
 
 export type SurveyResultResponse = {
