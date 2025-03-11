@@ -142,6 +142,14 @@ export class SurveysService {
                 }
                 else {
                     // create
+                    if (question.id) {
+                        // console.log("question.id", question.id)
+                        // console.log("question", question)
+                        // answerDto["questionId"] = question.id
+                        // answerDto["question"] = question
+                        const a = await this.answersService.createAnswer(answerDto, question.id)
+                        console.log(">>>>>>>>>>", a)
+                    }
                 }
 
                 // await this.updateAnswer(answerDto, question.answers, question)

@@ -2,7 +2,7 @@ import {BadRequestException, ForbiddenException, Injectable, NotFoundException} 
 import {InjectRepository} from "@nestjs/typeorm"
 import {Repository} from "typeorm"
 import {Survey} from "./survey.entity"
-import {CreateSurveyDto, UpdateAnswerDto, UpdateSurveyDto} from "./create-survey.dto"
+import {CreateAnswerDto, CreateSurveyDto, UpdateAnswerDto, UpdateSurveyDto} from "./create-survey.dto"
 import {SaveSurveyResultDto} from "./save-survey-result.dto"
 import {SurveyResult} from "./survey-result.entity"
 import {DBError} from "../DBError"
@@ -19,21 +19,17 @@ export class AnswersService {
     ) {
     }
 
-    // async createAnswer(data: CreateAnswerDto, userId: number): Promise<Survey> {
-    //     this.addCreatedByUser(data, userId)
-    //     const survey = this.surveyRepository.create(data)
-    //     return await this.surveyRepository.save(survey)
-    // }
+    async createAnswer(data: CreateAnswerDto, questionId: number): Promise<Answer> {
+        const answer = this.answerRepository.create({
+            ...data,
+            questionId: questionId
+        })
+        return await this.answerRepository.save(answer)
+    }
 
     // TODO: если обновлять отдельными запросами, то можно отказаться от UpdateAnswerDto в сторону 1 dto
     async updateAnswer(userId: number, surveyId: number, answerDto: UpdateAnswerDto, isReturnUpdatedData: boolean = true): Promise<Answer | null> {
-
-        const answer = await this.answerRepository
-            .createQueryBuilder("answer")
-            .leftJoinAndSelect("answer.question", "question")
-            .leftJoinAndSelect("question.survey", "survey")
-            .where({id: answerDto.id})
-            .getOne()
+        const answer = await this.getAnswerWithSurveyHierarchy(answerDto)
 
         if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
         if (answer.question.survey.id !== surveyId || answer.question.survey.createdBy !== userId) throw new ForbiddenException("У вас нет прав на обновление этого ответа.")
@@ -45,4 +41,12 @@ export class AnswersService {
         return null
     }
 
+    private async getAnswerWithSurveyHierarchy(answerDto: UpdateAnswerDto): Promise<Answer> {
+        return await this.answerRepository
+            .createQueryBuilder("answer")
+            .leftJoinAndSelect("answer.question", "question")
+            .leftJoinAndSelect("question.survey", "survey")
+            .where({id: answerDto.id})
+            .getOne()
+    }
 }

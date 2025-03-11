@@ -1,4 +1,4 @@
-import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany} from "typeorm"
+import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn} from "typeorm"
 import { Question } from "./question.entity"
 import {SurveyResult} from "./survey-result.entity"
 
@@ -11,8 +11,10 @@ export class Answer {
   title: string
 
   @ManyToOne(() => Question, (question) => question.answers)
+  @JoinColumn({ name: "questionId" })
   question: Question
 
+  @Column({ nullable: false })
   questionId: number
 
   @OneToMany(() => SurveyResult, (result) => result.answer)
