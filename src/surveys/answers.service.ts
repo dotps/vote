@@ -20,6 +20,7 @@ export class AnswersService {
     }
 
     async createAnswer(data: CreateAnswerDto, questionId: number): Promise<Answer> {
+        // TODO: протестировать + exception
         const answer = this.answerRepository.create({
             ...data,
             questionId: questionId
