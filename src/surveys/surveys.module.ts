@@ -6,10 +6,11 @@ import { Survey } from "./survey.entity"
 import { SurveyResult } from "./survey-result.entity"
 import {Question} from "./question.entity"
 import {Answer} from "./answer.entity"
+import {AnswersService} from "./answers.service"
 
 @Module({
   imports: [TypeOrmModule.forFeature([Survey, Question, Answer, SurveyResult])],
   controllers: [SurveysController],
-  providers: [SurveysService]
+  providers: [SurveysService, AnswersService]
 })
 export class SurveysModule {}

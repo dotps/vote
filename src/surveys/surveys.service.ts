@@ -9,6 +9,7 @@ import {DBError} from "../DBError"
 import {ISurveyDto} from "./survey.dto"
 import {Question} from "./question.entity"
 import {Answer} from "./answer.entity"
+import {AnswersService} from "./answers.service"
 
 @Injectable()
 export class SurveysService {
@@ -16,12 +17,11 @@ export class SurveysService {
     constructor(
         @InjectRepository(Survey)
         private readonly surveyRepository: Repository<Survey>,
-        @InjectRepository(Answer)
-        private readonly answerRepository: Repository<Answer>,
         @InjectRepository(Question)
         private readonly questionRepository: Repository<Question>,
         @InjectRepository(SurveyResult)
         private readonly resultRepository: Repository<SurveyResult>,
+        private answersService: AnswersService,
     ) {
     }
 
@@ -138,7 +138,7 @@ export class SurveysService {
                 console.log(answerDto)
 
                 if (answerDto.id) {
-                    const a = await this.updateAnswer(userId, surveyId, answerDto)
+                    const a = await this.answersService.updateAnswer(userId, surveyId, answerDto, false)
                 }
                 else {
                     // create
@@ -163,25 +163,6 @@ export class SurveysService {
         // console.log(survey)
 
         // await this.surveyRepository.save(survey)
-    }
-
-    // TODO: если обновлять отдельными запросами, то можно отказаться от UpdateAnswerDto в сторону 1 dto
-    // TODO: перенести в AnswerService + добавить флаг возвращать ли данные (чтиобы не делать запросы в каскадном обновлении)
-    async updateAnswer(userId: number, surveyId: number, answerDto: UpdateAnswerDto): Promise<Answer> {
-
-        const answer = await this.answerRepository
-            .createQueryBuilder("answer")
-            .leftJoinAndSelect("answer.question", "question")
-            .leftJoinAndSelect("question.survey", "survey")
-            .where({id: answerDto.id})
-            .getOne()
-
-        if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
-        if (answer.question.survey.id !== surveyId || answer.question.survey.createdBy !== userId) throw new ForbiddenException("У вас нет прав на обновление этого ответа.")
-
-        answer.title = answerDto.title
-        await this.answerRepository.update(answerDto.id, answer)
-        return await this.answerRepository.findOneBy({id: answerDto.id})
     }
 
 }

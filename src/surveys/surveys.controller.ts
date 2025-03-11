@@ -3,24 +3,29 @@ import {
     Controller,
     Get,
     Param,
-    ParseIntPipe, Patch,
+    ParseIntPipe,
+    Patch,
     Post,
     Put,
     Request,
     UsePipes,
     ValidationPipe,
 } from "@nestjs/common"
-import { SurveyResultResponse, SurveysService } from "./surveys.service"
-import { Survey } from "./survey.entity"
-import { SaveSurveyResultDto } from "./save-survey-result.dto"
+import {SurveyResultResponse, SurveysService} from "./surveys.service"
+import {Survey} from "./survey.entity"
+import {SaveSurveyResultDto} from "./save-survey-result.dto"
 import {CreateSurveyDto, UpdateAnswerDto, UpdateSurveyDto} from "./create-survey.dto"
-import { SurveyResult } from "./survey-result.entity"
+import {SurveyResult} from "./survey-result.entity"
 import {Answer} from "./answer.entity"
+import {AnswersService} from "./answers.service"
 
 @Controller("surveys")
 export class SurveysController {
 
-    constructor(private surveysService: SurveysService) {
+    constructor(
+        private surveysService: SurveysService,
+        private answersService: AnswersService,
+    ) {
     }
 
     @Post()
@@ -59,9 +64,9 @@ export class SurveysController {
     @Put(":id")
     @UsePipes(ValidationPipe)
     async updateSurvey(
-      @Param("id", ParseIntPipe) id: number,
-      @Body() data: UpdateSurveyDto,
-      @Request() request: any
+        @Param("id", ParseIntPipe) id: number,
+        @Body() data: UpdateSurveyDto,
+        @Request() request: any
     ): Promise<void> {
         const userId = request.user.id // TODO: разобраться с типами, или сделать отдельный класс CurrentUser
         console.log(userId)
@@ -82,6 +87,6 @@ export class SurveysController {
             ...data,
             id: answerId,
         }
-        return await this.surveysService.updateAnswer(userId, surveyId, answerDto)
+        return await this.answersService.updateAnswer(userId, surveyId, answerDto)
     }
 }
