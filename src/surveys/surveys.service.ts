@@ -107,6 +107,7 @@ export class SurveysService {
             let question: Question
 
             if (questionDto.id) {
+
                 // TODO: продолжить
                 console.log(questionDto.id)
                 question = survey.questions.find(q => q.id === questionDto.id)
