@@ -165,29 +165,7 @@ export class SurveysService {
         // await this.surveyRepository.save(survey)
     }
 
-    /*
     // TODO: если обновлять отдельными запросами, то можно отказаться от UpdateAnswerDto в сторону 1 dto
-    async updateAnswer(answerDto: UpdateAnswerDto, answers: Answer[], question: Question): Promise<void> {
-
-        if (!question.id) throw new NotFoundException(`Вопрос не найден.`)
-
-        let answer: Answer
-
-        if (!answerDto.id) {
-            answer = new Answer()
-        }
-        else {
-            // if (answers.length === 0 ) // TODO: получить список ответов из БД для индивидуального использования в  маршруте /surveys/1/answers/1
-            answer = answers.find(a => a.id === answerDto.id)
-            if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
-        }
-
-        answer.title = answerDto.title
-        answer.question = question // это важное условие
-
-        await this.answerRepository.save(answer)
-    }*/
-
     // TODO: перенести в AnswerService + добавить флаг возвращать ли данные (чтиобы не делать запросы в каскадном обновлении)
     async updateAnswer(userId: number, surveyId: number, answerDto: UpdateAnswerDto): Promise<Answer> {
 
