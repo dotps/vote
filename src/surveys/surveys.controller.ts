@@ -82,6 +82,6 @@ export class SurveysController {
             ...data,
             id: answerId,
         }
-        return await this.surveysService.updateAnswer(userId, surveyId, answerId, answerDto)
+        return await this.surveysService.updateAnswer(userId, surveyId, answerDto)
     }
 }

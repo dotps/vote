@@ -112,7 +112,7 @@ export class SurveysService {
             let question: Question
 
             if (questionDto.id) {
-                console.log("questionDto.id = ", questionDto.id)
+                // console.log("questionDto.id = ", questionDto.id)
                 // TODO: продолжить
                 // Что делать с вопросом который не передали: удалять / не трогать ??
                 // т.к. на фронтенде может быть возможность удаления вопроса / ответа
@@ -127,7 +127,7 @@ export class SurveysService {
                 survey.questions.push(question)
             }
 
-            console.log("questionDto.id = ", questionDto.id, "question.id = ", question.id)
+            // console.log("questionDto.id = ", questionDto.id, "question.id = ", question.id)
 
             question.title = questionDto.title
             question.answers = question.answers || []
@@ -135,7 +135,17 @@ export class SurveysService {
             for (const answerDto of questionDto.answers) {
                 let answer: Answer
 
+                console.log(answerDto)
+
+                if (answerDto.id) {
+                    const a = await this.updateAnswer(userId, surveyId, answerDto)
+                }
+                else {
+                    // create
+                }
+
                 // await this.updateAnswer(answerDto, question.answers, question)
+                // await this.updateAnswer(userId, surveyId, answerId, answerDto)
 
                 // if (answerDto.id) {
                 //     console.log("answerDto", answerDto.id)
@@ -178,22 +188,22 @@ export class SurveysService {
         await this.answerRepository.save(answer)
     }*/
 
-    // TODO: перенести в AnswerService
-    async updateAnswer(userId: number, surveyId: number, answerId: number, answerDto: UpdateAnswerDto): Promise<Answer> {
+    // TODO: перенести в AnswerService + добавить флаг возвращать ли данные (чтиобы не делать запросы в каскадном обновлении)
+    async updateAnswer(userId: number, surveyId: number, answerDto: UpdateAnswerDto): Promise<Answer> {
 
         const answer = await this.answerRepository
             .createQueryBuilder("answer")
             .leftJoinAndSelect("answer.question", "question")
             .leftJoinAndSelect("question.survey", "survey")
-            .where({id: answerId})
+            .where({id: answerDto.id})
             .getOne()
 
         if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
         if (answer.question.survey.id !== surveyId || answer.question.survey.createdBy !== userId) throw new ForbiddenException("У вас нет прав на обновление этого ответа.")
 
         answer.title = answerDto.title
-        await this.answerRepository.update(answerId, answer)
-        return await this.answerRepository.findOneBy({id: answerId})
+        await this.answerRepository.update(answerDto.id, answer)
+        return await this.answerRepository.findOneBy({id: answerDto.id})
     }
 
 }
