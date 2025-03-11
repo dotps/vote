@@ -1,4 +1,4 @@
-import {BadRequestException, Injectable, NotFoundException} from "@nestjs/common"
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common"
 import {InjectRepository} from "@nestjs/typeorm"
 import {Repository} from "typeorm"
 import {Survey} from "./survey.entity"
@@ -93,23 +93,24 @@ export class SurveysService {
         data["createdBy"] = userId
     }
 
-    async updateSurvey(data: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
+    async updateSurvey(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
         const survey = await this.getSurvey(surveyId)
-        if (!survey || survey.createdBy !== userId) throw new NotFoundException()
+        if (!survey) throw new NotFoundException()
+        if (survey.createdBy !== userId) throw new ForbiddenException()
 
-        console.log(data)
+        console.log(surveyDto)
 
-        survey.title = data.title
-        survey.description = data.description
+        survey.title = surveyDto.title
+        survey.description = surveyDto.description
 
-        for (const questionDto of data.questions) {
+        for (const questionDto of surveyDto.questions) {
             let question: Question
 
             if (questionDto.id) {
                 // TODO: продолжить
                 console.log(questionDto.id)
                 question = survey.questions.find(q => q.id === questionDto.id)
-                if (!question) throw new NotFoundException("Вопрос не найден")
+                if (!question) throw new NotFoundException("Вопрос не найден.")
             } else {
                 question = new Question()
                 survey.questions.push(question)
@@ -124,7 +125,7 @@ export class SurveysService {
                 if (answerDto.id) {
                     console.log(answerDto.id)
                     answer = question.answers.find(a => a.id === answerDto.id)
-                    if (!answer) throw new NotFoundException("Ответ не найден")
+                    if (!answer) throw new NotFoundException("Ответ не найден.")
                 } else {
                     answer = new Answer()
                 }
