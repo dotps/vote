@@ -3,7 +3,7 @@ import {
     Controller,
     Get,
     Param,
-    ParseIntPipe,
+    ParseIntPipe, Patch,
     Post,
     Put,
     Request,
@@ -15,6 +15,7 @@ import { Survey } from "./survey.entity"
 import { SaveSurveyResultDto } from "./save-survey-result.dto"
 import {CreateSurveyDto, UpdateAnswerDto, UpdateSurveyDto} from "./create-survey.dto"
 import { SurveyResult } from "./survey-result.entity"
+import {Answer} from "./answer.entity"
 
 @Controller("surveys")
 export class SurveysController {
@@ -66,5 +67,21 @@ export class SurveysController {
         console.log(userId)
         // console.log(data)
         return await this.surveysService.updateSurvey(data, userId, id)
+    }
+
+    @Patch(":surveyId/answers/:answerId")
+    @UsePipes(ValidationPipe)
+    async updateAnswer(
+        @Param("surveyId", ParseIntPipe) surveyId: number,
+        @Param("answerId", ParseIntPipe) answerId: number,
+        @Body() data: UpdateAnswerDto,
+        @Request() request: any
+    ): Promise<Answer> {
+        const userId = request.user.id // TODO: разобраться с типами, или сделать отдельный класс CurrentUser
+        const answerDto = {
+            ...data,
+            id: answerId,
+        }
+        return await this.surveysService.updateAnswer(userId, surveyId, answerId, answerDto)
     }
 }

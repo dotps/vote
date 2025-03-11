@@ -4,9 +4,11 @@ import { SurveysService } from './surveys.service';
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { Survey } from "./survey.entity"
 import { SurveyResult } from "./survey-result.entity"
+import {Question} from "./question.entity"
+import {Answer} from "./answer.entity"
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Survey, SurveyResult])],
+  imports: [TypeOrmModule.forFeature([Survey, Question, Answer, SurveyResult])],
   controllers: [SurveysController],
   providers: [SurveysService]
 })

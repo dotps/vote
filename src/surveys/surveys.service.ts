@@ -1,8 +1,8 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from "@nestjs/common"
+import {BadRequestException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common"
 import {InjectRepository} from "@nestjs/typeorm"
 import {Repository} from "typeorm"
 import {Survey} from "./survey.entity"
-import {CreateSurveyDto, UpdateSurveyDto} from "./create-survey.dto"
+import {CreateSurveyDto, UpdateAnswerDto, UpdateSurveyDto} from "./create-survey.dto"
 import {SaveSurveyResultDto} from "./save-survey-result.dto"
 import {SurveyResult} from "./survey-result.entity"
 import {DBError} from "../DBError"
@@ -16,6 +16,10 @@ export class SurveysService {
     constructor(
         @InjectRepository(Survey)
         private readonly surveyRepository: Repository<Survey>,
+        @InjectRepository(Answer)
+        private readonly answerRepository: Repository<Answer>,
+        @InjectRepository(Question)
+        private readonly questionRepository: Repository<Question>,
         @InjectRepository(SurveyResult)
         private readonly resultRepository: Repository<SurveyResult>,
     ) {
@@ -98,7 +102,8 @@ export class SurveysService {
         if (!survey) throw new NotFoundException()
         if (survey.createdBy !== userId) throw new ForbiddenException()
 
-        console.log(surveyDto)
+        // console.log(survey)
+        // console.log(surveyDto)
 
         survey.title = surveyDto.title
         survey.description = surveyDto.description
@@ -107,38 +112,88 @@ export class SurveysService {
             let question: Question
 
             if (questionDto.id) {
-
+                console.log("questionDto.id = ", questionDto.id)
                 // TODO: продолжить
-                console.log(questionDto.id)
+                // Что делать с вопросом который не передали: удалять / не трогать ??
+                // т.к. на фронтенде может быть возможность удаления вопроса / ответа
+                // или удаление реализовывать через отдельный маршрут, а обновлять только то что передано (так проще)
+                // console.log(questionDto.id)
                 question = survey.questions.find(q => q.id === questionDto.id)
-                if (!question) throw new NotFoundException("Вопрос не найден.")
+                const surveyQuestion = survey.questions.find(q => q.id === questionDto.id)
+                // console.log("surveyQuestion", surveyQuestion)
+                if (!question) throw new NotFoundException(`Вопрос id=${questionDto.id} не найден.`)
             } else {
                 question = new Question()
                 survey.questions.push(question)
             }
 
+            console.log("questionDto.id = ", questionDto.id, "question.id = ", question.id)
+
             question.title = questionDto.title
-            question.answers = []
+            question.answers = question.answers || []
 
             for (const answerDto of questionDto.answers) {
                 let answer: Answer
 
-                if (answerDto.id) {
-                    console.log(answerDto.id)
-                    answer = question.answers.find(a => a.id === answerDto.id)
-                    if (!answer) throw new NotFoundException("Ответ не найден.")
-                } else {
-                    answer = new Answer()
-                }
+                // await this.updateAnswer(answerDto, question.answers, question)
 
-                answer.title = answerDto.title
-                question.answers.push(answer)
+                // if (answerDto.id) {
+                //     console.log("answerDto", answerDto.id)
+                //     answer = question.answers.find(a => a.id === answerDto.id)
+                //     if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
+                // } else {
+                //     answer = new Answer()
+                // }
+                //
+                // answer.title = answerDto.title
+                // question.answers.push(answer)
             }
         }
 
-        console.log(survey)
+        // console.log(survey)
 
-        // return await this.surveyRepository.save(survey)
+        // await this.surveyRepository.save(survey)
+    }
+
+    /*
+    // TODO: если обновлять отдельными запросами, то можно отказаться от UpdateAnswerDto в сторону 1 dto
+    async updateAnswer(answerDto: UpdateAnswerDto, answers: Answer[], question: Question): Promise<void> {
+
+        if (!question.id) throw new NotFoundException(`Вопрос не найден.`)
+
+        let answer: Answer
+
+        if (!answerDto.id) {
+            answer = new Answer()
+        }
+        else {
+            // if (answers.length === 0 ) // TODO: получить список ответов из БД для индивидуального использования в  маршруте /surveys/1/answers/1
+            answer = answers.find(a => a.id === answerDto.id)
+            if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
+        }
+
+        answer.title = answerDto.title
+        answer.question = question // это важное условие
+
+        await this.answerRepository.save(answer)
+    }*/
+
+    // TODO: перенести в AnswerService
+    async updateAnswer(userId: number, surveyId: number, answerId: number, answerDto: UpdateAnswerDto): Promise<Answer> {
+
+        const answer = await this.answerRepository
+            .createQueryBuilder("answer")
+            .leftJoinAndSelect("answer.question", "question")
+            .leftJoinAndSelect("question.survey", "survey")
+            .where({id: answerId})
+            .getOne()
+
+        if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
+        if (answer.question.survey.id !== surveyId || answer.question.survey.createdBy !== userId) throw new ForbiddenException("У вас нет прав на обновление этого ответа.")
+
+        answer.title = answerDto.title
+        await this.answerRepository.update(answerId, answer)
+        return await this.answerRepository.findOneBy({id: answerId})
     }
 
 }

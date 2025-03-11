@@ -13,6 +13,8 @@ export class Answer {
   @ManyToOne(() => Question, (question) => question.answers)
   question: Question
 
+  questionId: number
+
   @OneToMany(() => SurveyResult, (result) => result.answer)
   results: SurveyResult[]
 }
