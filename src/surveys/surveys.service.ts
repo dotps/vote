@@ -10,6 +10,7 @@ import {ISurveyDto} from "./survey.dto"
 import {Question} from "./question.entity"
 import {Answer} from "./answer.entity"
 import {AnswersService} from "./answers.service"
+import {QuestionsService} from "./questions.service"
 
 @Injectable()
 export class SurveysService {
@@ -22,6 +23,7 @@ export class SurveysService {
         @InjectRepository(SurveyResult)
         private readonly resultRepository: Repository<SurveyResult>,
         private answersService: AnswersService,
+        private questionsService: QuestionsService,
     ) {
     }
 
@@ -97,81 +99,126 @@ export class SurveysService {
         data["createdBy"] = userId
     }
 
+    async updateSurveyCascade(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
+        // TODO: реализовать так, surveyDto разделить на 2 DTO createDto и updateDto
+        // и создать и обновить соответствующие объекты, нагрузка будет меньше, будет 2 транзакции
+    }
+
     async updateSurvey(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
+
         const survey = await this.getSurvey(surveyId)
         if (!survey) throw new NotFoundException()
         if (survey.createdBy !== userId) throw new ForbiddenException()
 
-        // console.log(survey)
-        // console.log(surveyDto)
+        const surveyFields: Partial<UpdateSurveyDto> = {
+            title: surveyDto.title,
+            description: surveyDto.description,
+        }
 
-        survey.title = surveyDto.title
-        survey.description = surveyDto.description
+        await this.surveyRepository.update(surveyId, surveyFields)
 
         for (const questionDto of surveyDto.questions) {
             let question: Question
-
-            if (questionDto.id) {
-                // console.log("questionDto.id = ", questionDto.id)
-                // TODO: продолжить
-                // Что делать с вопросом который не передали: удалять / не трогать ??
-                // т.к. на фронтенде может быть возможность удаления вопроса / ответа
-                // или удаление реализовывать через отдельный маршрут, а обновлять только то что передано (так проще)
-                // console.log(questionDto.id)
-                question = survey.questions.find(q => q.id === questionDto.id)
-                const surveyQuestion = survey.questions.find(q => q.id === questionDto.id)
-                // console.log("surveyQuestion", surveyQuestion)
-                if (!question) throw new NotFoundException(`Вопрос id=${questionDto.id} не найден.`)
-            } else {
-                question = new Question()
-                survey.questions.push(question)
+            const questionWithoutAnswersDto = {
+                ...questionDto,
+                answers: undefined // убрать вопросы чтобы каскадно не добавились
             }
 
-            // console.log("questionDto.id = ", questionDto.id, "question.id = ", question.id)
+            if (questionDto.id) {
+                question = survey.questions.find(q => q.id === questionDto.id)
+                if (!question) throw new NotFoundException(`Вопрос id=${questionDto.id} не найден.`)
+                await this.questionsService.updateQuestion(userId, surveyId, questionWithoutAnswersDto)
 
-            question.title = questionDto.title
-            question.answers = question.answers || []
+            } else {
+                question = await this.questionsService.createQuestion(userId, surveyId, questionWithoutAnswersDto)
+            }
 
             for (const answerDto of questionDto.answers) {
                 let answer: Answer
 
-                console.log(answerDto)
-
+                // TODO: при таком способе будут разные транзакции, отката не будет в случае ошибки
+                // есть возможноть использовать {transaction: false} для save + применить EntityManager
                 if (answerDto.id) {
-                    const a = await this.answersService.updateAnswer(userId, surveyId, answerDto, false)
+                    const isReturnUpdatedData = false
+                    const a = await this.answersService.updateAnswer(userId, surveyId, answerDto, isReturnUpdatedData)
                 }
                 else {
-                    // create
                     if (question.id) {
-                        // console.log("question.id", question.id)
-                        // console.log("question", question)
-                        // answerDto["questionId"] = question.id
-                        // answerDto["question"] = question
-                        const a = await this.answersService.createAnswer(answerDto, question.id)
-                        console.log(">>>>>>>>>>", a)
+                        await this.answersService.createAnswer(userId, surveyId, question.id, answerDto)
                     }
                 }
+            }
+        }
+    }
+/*
+    async updateSurvey(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
 
-                // await this.updateAnswer(answerDto, question.answers, question)
-                // await this.updateAnswer(userId, surveyId, answerId, answerDto)
+        const survey = await this.getSurvey(surveyId)
+        if (!survey) throw new NotFoundException()
+        if (survey.createdBy !== userId) throw new ForbiddenException()
 
-                // if (answerDto.id) {
-                //     console.log("answerDto", answerDto.id)
-                //     answer = question.answers.find(a => a.id === answerDto.id)
-                //     if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
-                // } else {
-                //     answer = new Answer()
-                // }
-                //
-                // answer.title = answerDto.title
-                // question.answers.push(answer)
+        console.log(survey)
+
+        survey.title = surveyDto.title
+        survey.description = surveyDto.description
+
+        // Собираем ID вопросов, которые были переданы в DTO
+        const updatedQuestionIds = surveyDto.questions.map(q => q.id).filter(id => id !== undefined)
+        // Удаляем вопросы, которые не были переданы в DTO (если требуется)
+        survey.questions = survey.questions.filter(q => updatedQuestionIds.includes(q.id))
+
+
+        // Обновляем или добавляем новые вопросы
+        for (const questionDto of surveyDto.questions) {
+            let question: Question
+
+            if (questionDto.id) {
+                // Находим существующий вопрос
+                question = survey.questions.find(q => q.id === questionDto.id)
+                if (!question) throw new NotFoundException(`Вопрос id=${questionDto.id} не найден.`)
+            } else {
+                // Создаем новый вопрос
+                question = new Question()
+                survey.questions.push(question)
+            }
+
+            // Обновляем данные вопроса
+            question.title = questionDto.title
+            question.answers = question.answers || []
+
+            // Собираем ID ответов, которые были переданы в DTO
+            const updatedAnswerIds = questionDto.answers.map(a => a.id).filter(id => id !== undefined)
+            // Удаляем ответы, которые не были переданы в DTO (если требуется)
+            question.answers = question.answers.filter(a => updatedAnswerIds.includes(a.id))
+
+            // Обновляем или добавляем новые ответы
+            for (const answerDto of questionDto.answers) {
+                let answer: Answer
+
+                if (answerDto.id) {
+                    // Находим существующий ответ
+                    answer = question.answers.find(a => a.id === answerDto.id)
+                    if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
+                } else {
+                    // Создаем новый ответ
+                    answer = new Answer()
+                    answer.questionId = question.id
+                    question.answers.push(answer)
+                }
+
+                // Обновляем данные ответа
+                answer.title = answerDto.title
             }
         }
 
-        // console.log(survey)
+        console.log(survey)
 
-        // await this.surveyRepository.save(survey)
-    }
+        // return
+
+
+        // Сохраняем все изменения одной транзакцией
+        await this.surveyRepository.save(survey)
+    }*/
 
 }
 

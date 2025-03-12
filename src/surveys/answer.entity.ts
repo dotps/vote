@@ -1,4 +1,13 @@
-import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn} from "typeorm"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+  CreateDateColumn,
+  UpdateDateColumn
+} from "typeorm"
 import { Question } from "./question.entity"
 import {SurveyResult} from "./survey-result.entity"
 
@@ -19,4 +28,10 @@ export class Answer {
 
   @OneToMany(() => SurveyResult, (result) => result.answer)
   results: SurveyResult[]
+
+  @CreateDateColumn()
+  createdAt: Date
+
+  @UpdateDateColumn()
+  updatedAt: Date
 }

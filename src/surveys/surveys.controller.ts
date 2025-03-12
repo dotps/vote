@@ -14,7 +14,7 @@ import {
 import {SurveyResultResponse, SurveysService} from "./surveys.service"
 import {Survey} from "./survey.entity"
 import {SaveSurveyResultDto} from "./save-survey-result.dto"
-import {CreateSurveyDto, UpdateAnswerDto, UpdateSurveyDto} from "./create-survey.dto"
+import {CreateAnswerDto, CreateSurveyDto, UpdateAnswerDto, UpdateSurveyDto} from "./create-survey.dto"
 import {SurveyResult} from "./survey-result.entity"
 import {Answer} from "./answer.entity"
 import {AnswersService} from "./answers.service"
@@ -88,5 +88,19 @@ export class SurveysController {
             id: answerId,
         }
         return await this.answersService.updateAnswer(userId, surveyId, answerDto)
+    }
+
+    @Post(":surveyId/questions/:questionId/answers")
+    @UsePipes(ValidationPipe)
+    async createAnswer(
+        @Param("surveyId", ParseIntPipe) surveyId: number,
+        @Param("questionId", ParseIntPipe) questionId: number,
+        @Body() data: CreateAnswerDto,
+        @Request() request: any
+    ): Promise<Answer> {
+        const userId = request.user.id // TODO: разобраться с типами, или сделать отдельный класс CurrentUser
+        console.log(data)
+        const checkUserCanCreateAnswer = true
+        return await this.answersService.createAnswer(userId, surveyId, questionId, data, checkUserCanCreateAnswer)
     }
 }

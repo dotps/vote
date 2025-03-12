@@ -1,14 +1,10 @@
-import {BadRequestException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common"
+import {ForbiddenException, Injectable, NotFoundException} from "@nestjs/common"
 import {InjectRepository} from "@nestjs/typeorm"
 import {Repository} from "typeorm"
-import {Survey} from "./survey.entity"
-import {CreateAnswerDto, CreateSurveyDto, UpdateAnswerDto, UpdateSurveyDto} from "./create-survey.dto"
-import {SaveSurveyResultDto} from "./save-survey-result.dto"
-import {SurveyResult} from "./survey-result.entity"
-import {DBError} from "../DBError"
-import {ISurveyDto} from "./survey.dto"
-import {Question} from "./question.entity"
+import {CreateAnswerDto, UpdateAnswerDto} from "./create-survey.dto"
 import {Answer} from "./answer.entity"
+import {Question} from "./question.entity"
+import {DBError} from "../DBError"
 
 @Injectable()
 export class AnswersService {
@@ -16,16 +12,29 @@ export class AnswersService {
     constructor(
         @InjectRepository(Answer)
         private readonly answerRepository: Repository<Answer>,
+        @InjectRepository(Question)
+        private readonly questionRepository: Repository<Question>,
     ) {
     }
 
-    async createAnswer(data: CreateAnswerDto, questionId: number): Promise<Answer> {
-        // TODO: протестировать + exception
+    async createAnswer(userId: number, surveyId: number, questionId: number, data: CreateAnswerDto, checkUserCanCreateAnswer: boolean = false): Promise<Answer> {
+
+        if (checkUserCanCreateAnswer) {
+            const question = await this.getQuestionWithSurveyHierarchy(questionId)
+            if (!question) throw new NotFoundException(`Вопрос id=${questionId} не найден.`)
+            if (question?.survey?.id !== surveyId || question?.survey?.createdBy !== userId) throw new ForbiddenException("У вас нет прав на добавление ответа к этому вопросу.")
+        }
+
         const answer = this.answerRepository.create({
             ...data,
             questionId: questionId
         })
-        return await this.answerRepository.save(answer)
+
+        try {
+            return await this.answerRepository.save(answer)
+        } catch (error) {
+            DBError.handle(error)
+        }
     }
 
     // TODO: если обновлять отдельными запросами, то можно отказаться от UpdateAnswerDto в сторону 1 dto
@@ -33,9 +42,9 @@ export class AnswersService {
         const answer = await this.getAnswerWithSurveyHierarchy(answerDto)
 
         if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
-        if (answer.question.survey.id !== surveyId || answer.question.survey.createdBy !== userId) throw new ForbiddenException("У вас нет прав на обновление этого ответа.")
+        if (answer?.question?.survey?.id !== surveyId || answer?.question?.survey?.createdBy !== userId) throw new ForbiddenException("У вас нет прав на обновление этого ответа.")
 
-        answer.title = answerDto.title
+        answer.title = answerDto.title // TODO: тут завязано на код, надо бы answerDto использовать ,что передано, все обновлять
         await this.answerRepository.update(answerDto.id, answer)
 
         if (isReturnUpdatedData) return await this.answerRepository.findOneBy({id: answerDto.id})
@@ -43,11 +52,20 @@ export class AnswersService {
     }
 
     private async getAnswerWithSurveyHierarchy(answerDto: UpdateAnswerDto): Promise<Answer> {
+        console.log("getAnswerWithSurveyHierarchy")
         return await this.answerRepository
             .createQueryBuilder("answer")
             .leftJoinAndSelect("answer.question", "question")
             .leftJoinAndSelect("question.survey", "survey")
             .where({id: answerDto.id})
+            .getOne()
+    }
+
+    private async getQuestionWithSurveyHierarchy(questionId: number): Promise<Question> {
+        return await this.questionRepository
+            .createQueryBuilder("question")
+            .leftJoinAndSelect("question.survey", "survey")
+            .where({id: questionId})
             .getOne()
     }
 }
