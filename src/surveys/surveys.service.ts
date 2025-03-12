@@ -105,12 +105,14 @@ export class SurveysService {
         data["createdBy"] = userId
     }
 
-    // обновляение только изменившиеся записи и добавляет новые в одну транзакцию
+    // обновляет только изменившиеся записи и добавляет новые в одну транзакцию
     async updateSurveyCascade(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
 
         const survey = await this.getSurvey(surveyId)
         if (!survey) throw new NotFoundException()
         if (survey.createdBy !== userId) throw new ForbiddenException()
+
+        // TODO: разбить на мелкие методы
 
         survey.title = surveyDto.title
         survey.description = surveyDto.description
