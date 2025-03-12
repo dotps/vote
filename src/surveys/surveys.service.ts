@@ -114,10 +114,10 @@ export class SurveysService {
 
         // TODO: разбить на мелкие методы
 
-        survey.title = surveyDto.title
-        survey.description = surveyDto.description
+        const { questions: questionsDto, ...surveyFields } = surveyDto
+        this.updateSurveyFields(survey, surveyFields)
 
-        for (const questionDto of surveyDto.questions) {
+        for (const questionDto of questionsDto) {
             let question: Question
 
             if (questionDto.id) {
@@ -132,10 +132,17 @@ export class SurveysService {
                         answer = question.answers.find(a => a.id === answerDto.id)
                         if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
                         answer.title = answerDto.title
+                        // TODO: тут протестировать, answer никуда не передается
                     } else {
+                        // TODO: продолжить, вынести в метод и ниже заменить
                         answer = new Answer()
-                        answer.title = answerDto.title
+                        const {id: answerId, ...answerFields} = answerDto
+                        Object.assign(answer, answerFields)
                         question.answers.push(answer)
+
+                        // answer = new Answer()
+                        // answer.title = answerDto.title
+                        // question.answers.push(answer)
                     }
                 }
             } else {
@@ -144,6 +151,7 @@ export class SurveysService {
                 question.answers = []
 
                 for (const answerDto of questionDto.answers) {
+
                     const answer = new Answer()
                     answer.title = answerDto.title
                     question.answers.push(answer)
@@ -156,6 +164,9 @@ export class SurveysService {
         await this.surveyRepository.save(survey)
     }
 
+    private updateSurveyFields(survey: Survey, surveyFields: Partial<UpdateSurveyDto>) {
+        Object.assign(survey, surveyFields)
+    }
 
     async updateSurvey(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
 
