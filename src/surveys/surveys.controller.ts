@@ -71,7 +71,8 @@ export class SurveysController {
         const userId = request.user.id // TODO: разобраться с типами, или сделать отдельный класс CurrentUser
         console.log(userId)
         // console.log(data)
-        return await this.surveysService.updateSurvey(data, userId, id)
+        // return await this.surveysService.updateSurvey(data, userId, id)
+        return await this.surveysService.updateSurveyCascade(data, userId, id)
     }
 
     @Patch(":surveyId/answers/:answerId")

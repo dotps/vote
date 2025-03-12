@@ -2,7 +2,13 @@ import {BadRequestException, ForbiddenException, Injectable, NotFoundException} 
 import {InjectRepository} from "@nestjs/typeorm"
 import {Repository} from "typeorm"
 import {Survey} from "./survey.entity"
-import {CreateSurveyDto, UpdateAnswerDto, UpdateSurveyDto} from "./create-survey.dto"
+import {
+    CreateQuestionDto,
+    CreateSurveyDto,
+    UpdateAnswerDto,
+    UpdateQuestionDto,
+    UpdateSurveyDto
+} from "./create-survey.dto"
 import {SaveSurveyResultDto} from "./save-survey-result.dto"
 import {SurveyResult} from "./survey-result.entity"
 import {DBError} from "../DBError"
@@ -99,10 +105,55 @@ export class SurveysService {
         data["createdBy"] = userId
     }
 
+    // обновляение только изменившиеся записи и добавляет новые в одну транзакцию
     async updateSurveyCascade(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
-        // TODO: реализовать так, surveyDto разделить на 2 DTO createDto и updateDto
-        // и создать и обновить соответствующие объекты, нагрузка будет меньше, будет 2 транзакции
+
+        const survey = await this.getSurvey(surveyId)
+        if (!survey) throw new NotFoundException()
+        if (survey.createdBy !== userId) throw new ForbiddenException()
+
+        survey.title = surveyDto.title
+        survey.description = surveyDto.description
+
+        for (const questionDto of surveyDto.questions) {
+            let question: Question
+
+            if (questionDto.id) {
+                question = survey.questions.find(q => q.id === questionDto.id)
+                if (!question) throw new NotFoundException(`Вопрос id=${questionDto.id} не найден.`)
+                question.title = questionDto.title
+
+                for (const answerDto of questionDto.answers) {
+                    let answer: Answer
+
+                    if (answerDto.id) {
+                        answer = question.answers.find(a => a.id === answerDto.id)
+                        if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
+                        answer.title = answerDto.title
+                    } else {
+                        answer = new Answer()
+                        answer.title = answerDto.title
+                        question.answers.push(answer)
+                    }
+                }
+            } else {
+                question = new Question()
+                question.title = questionDto.title
+                question.answers = []
+
+                for (const answerDto of questionDto.answers) {
+                    const answer = new Answer()
+                    answer.title = answerDto.title
+                    question.answers.push(answer)
+                }
+
+                survey.questions.push(question)
+            }
+        }
+
+        await this.surveyRepository.save(survey)
     }
+
 
     async updateSurvey(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
 
@@ -141,8 +192,7 @@ export class SurveysService {
                 if (answerDto.id) {
                     const isReturnUpdatedData = false
                     const a = await this.answersService.updateAnswer(userId, surveyId, answerDto, isReturnUpdatedData)
-                }
-                else {
+                } else {
                     if (question.id) {
                         await this.answersService.createAnswer(userId, surveyId, question.id, answerDto)
                     }
@@ -150,75 +200,6 @@ export class SurveysService {
             }
         }
     }
-/*
-    async updateSurvey(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
-
-        const survey = await this.getSurvey(surveyId)
-        if (!survey) throw new NotFoundException()
-        if (survey.createdBy !== userId) throw new ForbiddenException()
-
-        console.log(survey)
-
-        survey.title = surveyDto.title
-        survey.description = surveyDto.description
-
-        // Собираем ID вопросов, которые были переданы в DTO
-        const updatedQuestionIds = surveyDto.questions.map(q => q.id).filter(id => id !== undefined)
-        // Удаляем вопросы, которые не были переданы в DTO (если требуется)
-        survey.questions = survey.questions.filter(q => updatedQuestionIds.includes(q.id))
-
-
-        // Обновляем или добавляем новые вопросы
-        for (const questionDto of surveyDto.questions) {
-            let question: Question
-
-            if (questionDto.id) {
-                // Находим существующий вопрос
-                question = survey.questions.find(q => q.id === questionDto.id)
-                if (!question) throw new NotFoundException(`Вопрос id=${questionDto.id} не найден.`)
-            } else {
-                // Создаем новый вопрос
-                question = new Question()
-                survey.questions.push(question)
-            }
-
-            // Обновляем данные вопроса
-            question.title = questionDto.title
-            question.answers = question.answers || []
-
-            // Собираем ID ответов, которые были переданы в DTO
-            const updatedAnswerIds = questionDto.answers.map(a => a.id).filter(id => id !== undefined)
-            // Удаляем ответы, которые не были переданы в DTO (если требуется)
-            question.answers = question.answers.filter(a => updatedAnswerIds.includes(a.id))
-
-            // Обновляем или добавляем новые ответы
-            for (const answerDto of questionDto.answers) {
-                let answer: Answer
-
-                if (answerDto.id) {
-                    // Находим существующий ответ
-                    answer = question.answers.find(a => a.id === answerDto.id)
-                    if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
-                } else {
-                    // Создаем новый ответ
-                    answer = new Answer()
-                    answer.questionId = question.id
-                    question.answers.push(answer)
-                }
-
-                // Обновляем данные ответа
-                answer.title = answerDto.title
-            }
-        }
-
-        console.log(survey)
-
-        // return
-
-
-        // Сохраняем все изменения одной транзакцией
-        await this.surveyRepository.save(survey)
-    }*/
 
 }
 
