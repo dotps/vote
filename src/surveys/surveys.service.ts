@@ -3,7 +3,6 @@ import {InjectRepository} from "@nestjs/typeorm"
 import {Repository} from "typeorm"
 import {Survey} from "./survey.entity"
 import {
-    CreateQuestionDto,
     CreateSurveyDto,
     UpdateAnswerDto,
     UpdateQuestionDto,
@@ -24,8 +23,6 @@ export class SurveysService {
     constructor(
         @InjectRepository(Survey)
         private readonly surveyRepository: Repository<Survey>,
-        @InjectRepository(Question)
-        private readonly questionRepository: Repository<Question>,
         @InjectRepository(SurveyResult)
         private readonly resultRepository: Repository<SurveyResult>,
         private answersService: AnswersService,

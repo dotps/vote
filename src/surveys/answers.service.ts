@@ -42,10 +42,13 @@ export class AnswersService {
         if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
         if (answer?.question?.survey?.id !== surveyId || answer?.question?.survey?.createdBy !== userId) throw new ForbiddenException("У вас нет прав на обновление этого ответа.")
 
-        answer.title = answerDto.title // TODO: тут завязано на код, надо бы answerDto использовать ,что передано, все обновлять
+        this.updateAnswerObjectFromDto(answer, answerDto)
         await this.answerRepository.update(answerDto.id, answer)
 
-        if (isReturnUpdatedData) return await this.answerRepository.findOneBy({id: answerDto.id})
+        if (isReturnUpdatedData) {
+            return await this.answerRepository.findOneBy({id: answerDto.id})
+        }
+
         return null
     }
 
@@ -82,6 +85,4 @@ export class AnswersService {
             Object.assign(answer, answerDto)
         }
     }
-
-
 }
