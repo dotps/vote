@@ -109,57 +109,11 @@ export class SurveysService {
     async updateSurveyCascade(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
 
         const survey = await this.getSurvey(surveyId)
-        if (!survey) throw new NotFoundException()
         if (survey.createdBy !== userId) throw new ForbiddenException()
 
-        // TODO: разбить на мелкие методы
-
-        const { questions: questionsDto, ...surveyFields } = surveyDto
+        const {questions: questionsDto, ...surveyFields} = surveyDto
         this.updateSurveyFields(survey, surveyFields)
-
-        for (const questionDto of questionsDto) {
-            let question: Question
-
-            if (questionDto.id) {
-                question = survey.questions.find(q => q.id === questionDto.id)
-                if (!question) throw new NotFoundException(`Вопрос id=${questionDto.id} не найден.`)
-                question.title = questionDto.title
-
-                for (const answerDto of questionDto.answers) {
-                    let answer: Answer
-
-                    if (answerDto.id) {
-                        answer = question.answers.find(a => a.id === answerDto.id)
-                        if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
-                        answer.title = answerDto.title
-                        // TODO: тут протестировать, answer никуда не передается
-                    } else {
-                        // TODO: продолжить, вынести в метод и ниже заменить
-                        answer = new Answer()
-                        const {id: answerId, ...answerFields} = answerDto
-                        Object.assign(answer, answerFields)
-                        question.answers.push(answer)
-
-                        // answer = new Answer()
-                        // answer.title = answerDto.title
-                        // question.answers.push(answer)
-                    }
-                }
-            } else {
-                question = new Question()
-                question.title = questionDto.title
-                question.answers = []
-
-                for (const answerDto of questionDto.answers) {
-
-                    const answer = new Answer()
-                    answer.title = answerDto.title
-                    question.answers.push(answer)
-                }
-
-                survey.questions.push(question)
-            }
-        }
+        this.updateQuestions(survey.questions, questionsDto)
 
         await this.surveyRepository.save(survey)
     }
@@ -168,6 +122,69 @@ export class SurveysService {
         Object.assign(survey, surveyFields)
     }
 
+
+    private createAnswerForQuestion(answerDto: UpdateAnswerDto, question: Question) {
+        const answer = this.createAnswer(answerDto)
+        question.answers.push(answer)
+    }
+
+    private createAnswer(answerDto: UpdateAnswerDto): Answer {
+        const answer = new Answer()
+        this.updateAnswerFromDto(answer, answerDto)
+        return answer
+    }
+
+    private updateAnswerFromDto(answer: Answer, answerDto: UpdateAnswerDto): void {
+        const {id, ...answerFields} = answerDto
+        Object.assign(answer, answerFields)
+    }
+
+    private updateQuestionFromDto(question: Question, questionDto: UpdateQuestionDto): void {
+        const {id, ...questionFields} = questionDto
+        Object.assign(question, questionFields)
+    }
+
+    private createUnrelatedQuestion(questionDto: UpdateQuestionDto): Question {
+        const question = new Question()
+        this.updateQuestionFromDto(question, questionDto)
+        question.answers = []
+        return question
+    }
+
+    private updateAnswer(answers: Answer[], answerDto: UpdateAnswerDto): Answer {
+        const answer = answers.find(a => a.id === answerDto.id)
+        if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
+        this.updateAnswerFromDto(answer, answerDto)
+        return answer
+    }
+
+    private updateQuestion(questions: Question[], questionDto: UpdateQuestionDto): Question {
+        const question = questions.find(q => q.id === questionDto.id)
+        if (!question) throw new NotFoundException(`Вопрос id=${questionDto.id} не найден.`)
+        question.title = questionDto.title
+        return question
+    }
+
+    private updateQuestions(questions: Question[], questionsDto: UpdateQuestionDto[]) {
+        for (const questionDto of questionsDto) {
+            if (questionDto.id) {
+                const question = this.updateQuestion(questions, questionDto)
+                for (const answerDto of questionDto.answers) {
+                    if (answerDto.id) this.updateAnswer(question.answers, answerDto)
+                    else this.createAnswerForQuestion(answerDto, question)
+                }
+            } else {
+                const question = this.createUnrelatedQuestion(questionDto)
+                for (const answerDto of questionDto.answers) {
+                    this.createAnswerForQuestion(answerDto, question)
+                }
+                questions.push(question)
+            }
+        }
+    }
+
+    /*
+    // обновляет с кучей запросов и транзакций, не оптимально
     async updateSurvey(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
 
         const survey = await this.getSurvey(surveyId)
@@ -213,7 +230,7 @@ export class SurveysService {
             }
         }
     }
-
+    */
 }
 
 export type SurveyResultResponse = {
