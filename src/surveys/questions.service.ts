@@ -66,4 +66,9 @@ export class QuestionsService {
         // if (isReturnUpdatedData) return await this.answerRepository.findOneBy({id: answerDto.id})
         // return null
     }
+
+    updateQuestionObjectFromDto(question: Question, questionDto: UpdateQuestionDto): void {
+        const {id, answers, ...questionFields} = questionDto
+        Object.assign(question, questionFields)
+    }
 }

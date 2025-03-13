@@ -113,28 +113,41 @@ export class SurveysService {
 
         const {questions: questionsDto, ...surveyFields} = surveyDto
         this.updateSurveyFields(survey, surveyFields)
-        this.updateQuestions(survey.questions, questionsDto)
+        this.updateQuestionsInSurvey(survey.questions, questionsDto)
 
         await this.surveyRepository.save(survey)
+    }
+
+    private updateQuestionsInSurvey(questions: Question[], questionsDto: UpdateQuestionDto[]) {
+        for (const questionDto of questionsDto) {
+            if (questionDto.id) {
+                const question = this.updateQuestion(questions, questionDto)
+                for (const answerDto of questionDto.answers) {
+                    if (answerDto.id) this.updateAnswer(question.answers, answerDto)
+                    else this.createAnswerAndAddToQuestion(answerDto, question)
+                }
+            } else {
+                const question = this.createQuestionFromDtoWithoutAnswers(questionDto)
+                for (const answerDto of questionDto.answers) {
+                    this.createAnswerAndAddToQuestion(answerDto, question)
+                }
+                questions.push(question)
+            }
+        }
     }
 
     private updateSurveyFields(survey: Survey, surveyFields: Partial<UpdateSurveyDto>) {
         Object.assign(survey, surveyFields)
     }
 
-    private createAnswerForQuestion(answerDto: UpdateAnswerDto, question: Question) {
+    private createAnswerAndAddToQuestion(answerDto: UpdateAnswerDto, question: Question) {
         const answer = this.answersService.createAnswerObjectFromDto(answerDto)
         question.answers.push(answer)
     }
 
-    private updateQuestionObjectFromDto(question: Question, questionDto: UpdateQuestionDto): void {
-        const {id, ...questionFields} = questionDto
-        Object.assign(question, questionFields)
-    }
-
-    private createUnrelatedQuestion(questionDto: UpdateQuestionDto): Question {
+    private createQuestionFromDtoWithoutAnswers(questionDto: UpdateQuestionDto): Question {
         const question = new Question()
-        this.updateQuestionObjectFromDto(question, questionDto)
+        this.questionsService.updateQuestionObjectFromDto(question, questionDto)
         question.answers = []
         return question
     }
@@ -149,27 +162,11 @@ export class SurveysService {
     private updateQuestion(questions: Question[], questionDto: UpdateQuestionDto): Question {
         const question = questions.find(q => q.id === questionDto.id)
         if (!question) throw new NotFoundException(`Вопрос id=${questionDto.id} не найден.`)
-        question.title = questionDto.title
+        this.questionsService.updateQuestionObjectFromDto(question, questionDto)
         return question
     }
 
-    private updateQuestions(questions: Question[], questionsDto: UpdateQuestionDto[]) {
-        for (const questionDto of questionsDto) {
-            if (questionDto.id) {
-                const question = this.updateQuestion(questions, questionDto)
-                for (const answerDto of questionDto.answers) {
-                    if (answerDto.id) this.updateAnswer(question.answers, answerDto)
-                    else this.createAnswerForQuestion(answerDto, question)
-                }
-            } else {
-                const question = this.createUnrelatedQuestion(questionDto)
-                for (const answerDto of questionDto.answers) {
-                    this.createAnswerForQuestion(answerDto, question)
-                }
-                questions.push(question)
-            }
-        }
-    }
+
 
     /*
     // обновляет с кучей запросов и транзакций, не оптимально
