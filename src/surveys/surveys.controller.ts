@@ -96,7 +96,7 @@ export class SurveysController {
         @Body() data: CreateAnswerDto,
         @Request() request: any
     ): Promise<Answer> {
-        const userId = request.user.id // TODO: разобраться с типами, или сделать отдельный класс CurrentUser
+        const userId = request.user.id //  TODO: разобраться с типами, или сделать отдельный класс CurrentUser
         console.log(data)
         const checkUserCanCreateAnswer = true
         return await this.answersService.createAnswer(userId, surveyId, questionId, data, checkUserCanCreateAnswer)
