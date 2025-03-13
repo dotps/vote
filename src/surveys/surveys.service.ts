@@ -105,8 +105,7 @@ export class SurveysService {
         data["createdBy"] = userId
     }
 
-    // обновляет только изменившиеся записи и добавляет новые в одну транзакцию
-    async updateSurveyCascade(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
+    async updateSurvey(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
 
         const survey = await this.getSurvey(surveyId)
         if (survey.createdBy !== userId) throw new ForbiddenException()
@@ -165,57 +164,6 @@ export class SurveysService {
         this.questionsService.updateQuestionObjectFromDto(question, questionDto)
         return question
     }
-
-
-
-    /*
-    // обновляет с кучей запросов и транзакций, не оптимально
-    async updateSurvey(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
-
-        const survey = await this.getSurvey(surveyId)
-        if (!survey) throw new NotFoundException()
-        if (survey.createdBy !== userId) throw new ForbiddenException()
-
-        const surveyFields: Partial<UpdateSurveyDto> = {
-            title: surveyDto.title,
-            description: surveyDto.description,
-        }
-
-        await this.surveyRepository.update(surveyId, surveyFields)
-
-        for (const questionDto of surveyDto.questions) {
-            let question: Question
-            const questionWithoutAnswersDto = {
-                ...questionDto,
-                answers: undefined // убрать вопросы чтобы каскадно не добавились
-            }
-
-            if (questionDto.id) {
-                question = survey.questions.find(q => q.id === questionDto.id)
-                if (!question) throw new NotFoundException(`Вопрос id=${questionDto.id} не найден.`)
-                await this.questionsService.updateQuestion(userId, surveyId, questionWithoutAnswersDto)
-
-            } else {
-                question = await this.questionsService.createQuestion(userId, surveyId, questionWithoutAnswersDto)
-            }
-
-            for (const answerDto of questionDto.answers) {
-                let answer: Answer
-
-                // TODO: при таком способе будут разные транзакции, отката не будет в случае ошибки
-                // есть возможноть использовать {transaction: false} для save + применить EntityManager
-                if (answerDto.id) {
-                    const isReturnUpdatedData = false
-                    const a = await this.answersService.updateAnswer(userId, surveyId, answerDto, isReturnUpdatedData)
-                } else {
-                    if (question.id) {
-                        await this.answersService.createAnswer(userId, surveyId, question.id, answerDto)
-                    }
-                }
-            }
-        }
-    }
-    */
 }
 
 export type SurveyResultResponse = {
