@@ -25,10 +25,8 @@ export class AnswersService {
             if (question?.survey?.id !== surveyId || question?.survey?.createdBy !== userId) throw new ForbiddenException("У вас нет прав на добавление ответа к этому вопросу.")
         }
 
-        const answer = this.answerRepository.create({
-            ...data,
-            questionId: questionId
-        })
+        const answer = this.createAnswerObjectFromDto(data)
+        answer.questionId = questionId
 
         try {
             return await this.answerRepository.save(answer)
@@ -68,4 +66,22 @@ export class AnswersService {
             .where({id: questionId})
             .getOne()
     }
+
+    createAnswerObjectFromDto(answerDto: CreateAnswerDto | UpdateAnswerDto): Answer {
+        const answer = new Answer()
+        this.updateAnswerObjectFromDto(answer, answerDto)
+        return answer
+    }
+
+    updateAnswerObjectFromDto(answer: Answer, answerDto: CreateAnswerDto | UpdateAnswerDto): void {
+        if ("id" in answerDto) {
+            const {id, ...answerFields} = answerDto
+            Object.assign(answer, answerFields)
+        }
+        else {
+            Object.assign(answer, answerDto)
+        }
+    }
+
+
 }

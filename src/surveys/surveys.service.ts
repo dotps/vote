@@ -122,31 +122,19 @@ export class SurveysService {
         Object.assign(survey, surveyFields)
     }
 
-
     private createAnswerForQuestion(answerDto: UpdateAnswerDto, question: Question) {
-        const answer = this.createAnswer(answerDto)
+        const answer = this.answersService.createAnswerObjectFromDto(answerDto)
         question.answers.push(answer)
     }
 
-    private createAnswer(answerDto: UpdateAnswerDto): Answer {
-        const answer = new Answer()
-        this.updateAnswerFromDto(answer, answerDto)
-        return answer
-    }
-
-    private updateAnswerFromDto(answer: Answer, answerDto: UpdateAnswerDto): void {
-        const {id, ...answerFields} = answerDto
-        Object.assign(answer, answerFields)
-    }
-
-    private updateQuestionFromDto(question: Question, questionDto: UpdateQuestionDto): void {
+    private updateQuestionObjectFromDto(question: Question, questionDto: UpdateQuestionDto): void {
         const {id, ...questionFields} = questionDto
         Object.assign(question, questionFields)
     }
 
     private createUnrelatedQuestion(questionDto: UpdateQuestionDto): Question {
         const question = new Question()
-        this.updateQuestionFromDto(question, questionDto)
+        this.updateQuestionObjectFromDto(question, questionDto)
         question.answers = []
         return question
     }
@@ -154,7 +142,7 @@ export class SurveysService {
     private updateAnswer(answers: Answer[], answerDto: UpdateAnswerDto): Answer {
         const answer = answers.find(a => a.id === answerDto.id)
         if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
-        this.updateAnswerFromDto(answer, answerDto)
+        this.answersService.updateAnswerObjectFromDto(answer, answerDto)
         return answer
     }
 
