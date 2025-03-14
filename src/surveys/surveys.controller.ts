@@ -24,6 +24,7 @@ import {CurrentUser} from "../users/current-user.decorator"
 import {User} from "../users/user.entity"
 import {ResponseResult} from "../responses/Responses"
 import {UpdateAnswerDto, UpdateSurveyDto, UpdateSurveyStatusDto} from "./update-survey.dto"
+import {Public} from "../auth/public.decorator"
 
 @Controller("surveys")
 export class SurveysController {
@@ -40,6 +41,7 @@ export class SurveysController {
         return await this.surveysService.createSurvey(data, user.id)
     }
 
+    @Public()
     @Get()
     async getAllSurveys(): Promise<Survey[]> {
         return await this.surveysService.getAllSurveys()

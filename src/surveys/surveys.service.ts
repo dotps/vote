@@ -36,27 +36,33 @@ export class SurveysService {
         return await this.surveyRepository.save(survey)
     }
 
-    // TODO: добавить что отлько окрытые для просмотра опроса доступны
     async getAllSurveys(): Promise<Survey[]> {
-        const surveys = await this.surveyRepository.find()
+        const surveys = await this.surveyRepository.find({
+            where: { enabled: true }
+        })
         if (surveys.length === 0) throw new NotFoundException(ErrorsMessages.SURVEY_NOT_FOUND)
         return surveys
     }
 
-    // TODO: добавить что отлько окрытые для просмотра опроса доступны
-    async getSurvey(id: number, isExcludeRelations: boolean = false): Promise<Survey> {
-        const relations = isExcludeRelations ? [] : ["questions", "questions.answers"]
+    async getSurvey(id: number, options: GetSurveyOptions = defaultGetSurveyOptions): Promise<Survey> {
+        const relations = options.isExcludeRelations ? [] : ["questions", "questions.answers"]
         const survey = await this.surveyRepository.findOne({
-            where: {id: id},
+            where: {
+                id: id,
+                enabled: options.enabled,
+            },
             relations: relations,
         })
         if (!survey) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.SURVEY_NOT_FOUND)
         return survey
     }
 
-    // TODO: добавить что отлько окрытые для просмотра опроса доступны
     async saveUserSurveyResult(userId: number, surveyId: number, data: SaveSurveyResultDto): Promise<SurveyResult[]> {
-        if (data.questions.length === 0) throw new BadRequestException(ErrorsMessages.QUESTIONS_NOT_EMPTY) // TODO: можно ли через ValidationPipe проверить количество?
+
+        const survey = await this.getSurvey(surveyId, {isExcludeRelations: true, enabled: true})
+        if (!survey) throw new NotFoundException(Errors.displayId(surveyId) + ErrorsMessages.SURVEY_NOT_FOUND)
+
+        if (data.questions.length === 0) throw new BadRequestException(ErrorsMessages.QUESTIONS_NOT_EMPTY)
 
         const saveResults: SurveyResult[] = []
         for (const question of data.questions) {
@@ -106,7 +112,6 @@ export class SurveysService {
         data["createdBy"] = userId
     }
 
-    // TODO: добавить что отлько окрытые для просмотра опроса доступны
     async updateSurvey(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
 
         const survey = await this.getSurvey(surveyId)
@@ -119,7 +124,6 @@ export class SurveysService {
         await this.surveyRepository.save(survey)
     }
 
-    // TODO: добавить что отлько окрытые для просмотра опроса доступны
     private updateQuestionsInSurvey(questions: Question[], questionsDto: UpdateQuestionDto[]) {
         for (const questionDto of questionsDto) {
             if (questionDto.id) {
@@ -169,8 +173,7 @@ export class SurveysService {
     }
 
     async setSurveyActive(userId: number, surveyId: number, status: boolean): Promise<ResponseResult> {
-        const isExcludeRelations = true
-        const survey = await this.getSurvey(surveyId, isExcludeRelations)
+        const survey = await this.getSurvey(surveyId, {isExcludeRelations: true})
         if (survey.createdBy !== userId) throw new ForbiddenException(ErrorsMessages.SURVEY_UPDATE_FORBIDDEN)
 
         const surveyForUpdate = this.surveyRepository.create({
@@ -180,6 +183,16 @@ export class SurveysService {
         const result = await this.surveyRepository.update(surveyId, surveyForUpdate)
         return Responses.update(result)
     }
+}
+
+export type GetSurveyOptions = {
+    isExcludeRelations: boolean
+    enabled?: boolean
+}
+
+const defaultGetSurveyOptions: GetSurveyOptions = {
+    isExcludeRelations: false,
+    enabled: undefined,
 }
 
 export type SurveyResultResponse = {
