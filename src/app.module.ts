@@ -5,7 +5,7 @@ import { databaseProvider } from "./providers/database.provider"
 import { configModule } from "./config/config"
 import { UserModule } from "./users/user.module"
 import { AuthModule } from "./auth/auth.module"
-import { APP_GUARD } from "@nestjs/core"
+import {APP_GUARD} from "@nestjs/core"
 import { AuthGuard } from "./auth/auth.guard"
 import { SurveysModule } from './surveys/surveys.module';
 

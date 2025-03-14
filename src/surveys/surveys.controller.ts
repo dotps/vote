@@ -60,7 +60,8 @@ export class SurveysController {
     @Post(":id")
     @UsePipes(ValidationPipe)
     async saveSurveyResult(
-        @Param("id", ParseIntPipe) id: number,
+        @Param("id") id: number,
+        // @Param("id", ParseIntPipe) id: number,
         @Body() data: SaveSurveyResultDto,
         @CurrentUser() user: User
     ): Promise<SurveyResult[]> {

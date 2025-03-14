@@ -1,13 +1,6 @@
-import {BadRequestException, HttpException} from "@nestjs/common"
-import {throttle} from "rxjs"
+import {BadRequestException} from "@nestjs/common"
 
 export class DBError {
-    // static handle(code: string) {
-    //     if (!errors[code]) return
-    //     const exceptionMethod = errors[code].exception || BadRequestException
-    //     const message = errors[code].message || null
-    //     throw new exceptionMethod(message)
-    // }
     static handle(error: any) {
         const code: string = error?.code?.toString() || ""
         if (!code || !errors[code]) throw error
