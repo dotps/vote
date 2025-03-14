@@ -8,10 +8,6 @@ import { AuthModule } from "./auth/auth.module"
 import { APP_GUARD } from "@nestjs/core"
 import { AuthGuard } from "./auth/auth.guard"
 import { SurveysModule } from './surveys/surveys.module';
-import {TokenService} from "./auth/token.service"
-import {JwtService} from "@nestjs/jwt"
-
-// TODO: сделать модуль surveys
 
 @Module({
   imports: [
@@ -28,8 +24,6 @@ import {JwtService} from "@nestjs/jwt"
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
-    // JwtService,
-    // TokenService
   ],
 })
 

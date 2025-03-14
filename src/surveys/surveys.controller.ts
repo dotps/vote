@@ -7,7 +7,6 @@ import {
     Patch,
     Post,
     Put,
-    Request,
     UsePipes,
     ValidationPipe,
 } from "@nestjs/common"
@@ -18,6 +17,8 @@ import {CreateAnswerDto, CreateSurveyDto, UpdateAnswerDto, UpdateSurveyDto} from
 import {SurveyResult} from "./survey-result.entity"
 import {Answer} from "./answer.entity"
 import {AnswersService} from "./answers.service"
+import {CurrentUser} from "../users/current-user.decorator"
+import {User} from "../users/user.entity"
 
 @Controller("surveys")
 export class SurveysController {
@@ -30,9 +31,8 @@ export class SurveysController {
 
     @Post()
     @UsePipes(ValidationPipe)
-    async createSurvey(@Body() data: CreateSurveyDto, @Request() request: any): Promise<Survey> {
-        const userId = request.user.id // TODO: разобраться с типами, или сделать отдельный класс CurrentUser
-        return await this.surveysService.createSurvey(data, userId)
+    async createSurvey(@Body() data: CreateSurveyDto, @CurrentUser() user: User): Promise<Survey> {
+        return await this.surveysService.createSurvey(data, user.id)
     }
 
     @Get()
@@ -55,10 +55,9 @@ export class SurveysController {
     async saveSurveyResult(
         @Param("id", ParseIntPipe) id: number,
         @Body() data: SaveSurveyResultDto,
-        @Request() request: any
+        @CurrentUser() user: User
     ): Promise<SurveyResult[]> {
-        const userId = request.user.id
-        return await this.surveysService.saveUserSurveyResult(userId, id, data)
+        return await this.surveysService.saveUserSurveyResult(user.id, id, data)
     }
 
     @Put(":id")
@@ -66,10 +65,9 @@ export class SurveysController {
     async updateSurvey(
         @Param("id", ParseIntPipe) id: number,
         @Body() data: UpdateSurveyDto,
-        @Request() request: any
+        @CurrentUser() user: User
     ): Promise<void> {
-        const userId = request.user.id // TODO: разобраться с типами, или сделать отдельный класс CurrentUser
-        return await this.surveysService.updateSurvey(data, userId, id)
+        return await this.surveysService.updateSurvey(data, user.id, id)
     }
 
     @Patch(":surveyId/answers/:answerId")
@@ -78,14 +76,13 @@ export class SurveysController {
         @Param("surveyId", ParseIntPipe) surveyId: number,
         @Param("answerId", ParseIntPipe) answerId: number,
         @Body() data: UpdateAnswerDto,
-        @Request() request: any
+        @CurrentUser() user: User
     ): Promise<Answer> {
-        const userId = request.user.id // TODO: разобраться с типами, или сделать отдельный класс CurrentUser
         const answerDto = {
             ...data,
             id: answerId,
         }
-        return await this.answersService.updateAnswer(userId, surveyId, answerDto)
+        return await this.answersService.updateAnswer(user.id, surveyId, answerDto)
     }
 
     @Post(":surveyId/questions/:questionId/answers")
@@ -94,11 +91,9 @@ export class SurveysController {
         @Param("surveyId", ParseIntPipe) surveyId: number,
         @Param("questionId", ParseIntPipe) questionId: number,
         @Body() data: CreateAnswerDto,
-        @Request() request: any
+        @CurrentUser() user: User
     ): Promise<Answer> {
-        const userId = request.user.id //  TODO: разобраться с типами, или сделать отдельный класс CurrentUser
-        console.log(data)
         const checkUserCanCreateAnswer = true
-        return await this.answersService.createAnswer(userId, surveyId, questionId, data, checkUserCanCreateAnswer)
+        return await this.answersService.createAnswer(user.id, surveyId, questionId, data, checkUserCanCreateAnswer)
     }
 }

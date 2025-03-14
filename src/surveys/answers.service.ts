@@ -53,7 +53,6 @@ export class AnswersService {
     }
 
     private async getAnswerWithSurveyHierarchy(answerDto: UpdateAnswerDto): Promise<Answer> {
-        console.log("getAnswerWithSurveyHierarchy")
         return await this.answerRepository
             .createQueryBuilder("answer")
             .leftJoinAndSelect("answer.question", "question")
