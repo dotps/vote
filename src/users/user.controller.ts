@@ -1,10 +1,23 @@
-import { Body, Controller, Param, ParseIntPipe, Patch, Post, Put, UsePipes, ValidationPipe } from "@nestjs/common"
+import {
+    Body,
+    Controller,
+    ForbiddenException,
+    Param,
+    ParseIntPipe,
+    Patch,
+    Post,
+    Put,
+    UsePipes,
+    ValidationPipe
+} from "@nestjs/common"
 import { UserService } from "./user.service"
 import { User } from "./user.entity"
 import { UserDto } from "./user.dto"
 import { Public } from "../auth/public.decorator"
 import { ValidationGroup } from "../ValidationGroup"
 import {AuthDto} from "../auth/auth.dto"
+import {CurrentUser} from "./current-user.decorator"
+import {ErrorsMessages} from "../errors/errors"
 
 @Controller("users")
 export class UserController {
@@ -21,13 +34,23 @@ export class UserController {
 
     @Put(":id")
     @UsePipes(new ValidationPipe({ groups: [ValidationGroup.UPDATE] }))
-    async update(@Param("id", ParseIntPipe) id: number, @Body() data: UserDto): Promise<User> {
+    async update(
+        @Param("id", ParseIntPipe) id: number,
+        @Body() data: UserDto,
+        @CurrentUser() user: User,
+    ): Promise<User> {
+        if (user.id !== id) throw new ForbiddenException(ErrorsMessages.USER_UPDATE_FORBIDDEN)
         return this.userService.updateUser(id, data)
     }
 
     @Patch(":id")
     @UsePipes(new ValidationPipe({ groups: [ValidationGroup.PARTIAL_UPDATE] }))
-    async partialUpdate(@Param("id", ParseIntPipe) id: number, @Body() data: UserDto): Promise<User> {
+    async partialUpdate(
+        @Param("id", ParseIntPipe) id: number,
+        @Body() data: UserDto,
+        @CurrentUser() user: User,
+    ): Promise<User> {
+        if (user.id !== id) throw new ForbiddenException(ErrorsMessages.USER_UPDATE_FORBIDDEN)
         return this.userService.updateUser(id, data)
     }
 }

@@ -3,7 +3,7 @@ import {InjectRepository} from "@nestjs/typeorm"
 import {Repository} from "typeorm"
 import {CreateQuestionDto, UpdateQuestionDto} from "./create-survey.dto"
 import {Question} from "./question.entity"
-import {DBError} from "../DBError"
+import {DBError} from "../errors/DBError"
 import {Survey} from "./survey.entity"
 
 @Injectable()

@@ -10,7 +10,7 @@ import {
 } from "./create-survey.dto"
 import {SaveSurveyResultDto} from "./save-survey-result.dto"
 import {SurveyResult} from "./survey-result.entity"
-import {DBError} from "../DBError"
+import {DBError} from "../errors/DBError"
 import {ISurveyDto} from "./survey.dto"
 import {Question} from "./question.entity"
 import {Answer} from "./answer.entity"

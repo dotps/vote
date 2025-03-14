@@ -4,7 +4,7 @@ import {Repository} from "typeorm"
 import {CreateAnswerDto, UpdateAnswerDto} from "./create-survey.dto"
 import {Answer} from "./answer.entity"
 import {Question} from "./question.entity"
-import {DBError} from "../DBError"
+import {DBError} from "../errors/DBError"
 
 @Injectable()
 export class AnswersService {
