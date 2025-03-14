@@ -35,7 +35,6 @@ export class AnswersService {
         }
     }
 
-    // TODO: если обновлять отдельными запросами, то можно отказаться от UpdateAnswerDto в сторону 1 dto
     async updateAnswer(userId: number, surveyId: number, answerDto: UpdateAnswerDto, isReturnUpdatedData: boolean = true): Promise<Answer | null> {
         const answer = await this.getAnswerWithSurveyHierarchy(answerDto)
 

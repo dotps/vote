@@ -4,6 +4,8 @@ import { UserDto } from "../users/user.dto"
 import { AuthGuard } from "./auth.guard"
 import { Public } from "./public.decorator"
 import { ValidationGroup } from "../ValidationGroup"
+import {CurrentUser} from "../users/current-user.decorator"
+import {User} from "../users/user.entity"
 
 @Controller("auth")
 export class AuthController {
@@ -20,7 +22,7 @@ export class AuthController {
   }
 
   @Get("profile")
-  getProfile(@Request() request) {
-    return request.user
+  getProfile(@CurrentUser() user: User) {
+    return user
   }
 }

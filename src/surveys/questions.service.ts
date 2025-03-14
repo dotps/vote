@@ -43,28 +43,13 @@ export class QuestionsService {
 
     async updateQuestion(userId: number, surveyId: number, questionDto: UpdateQuestionDto, checkCanUserCreateQuestion: boolean = false) {
         if (checkCanUserCreateQuestion) await this.checkCanUserCreateQuestionOrThrowError(userId, surveyId)
-
-
         questionDto.answers = undefined
-
-        console.log(questionDto)
 
         try {
             return await this.questionRepository.update(questionDto.id, questionDto)
         } catch (error) {
             DBError.handle(error)
         }
-
-        // const answer = await this.getAnswerWithSurveyHierarchy(answerDto)
-
-        // if (!answer) throw new NotFoundException(`Ответ id=${questionDto.id} не найден.`)
-        // if (answer?.question?.survey?.id !== surveyId || answer?.question?.survey?.createdBy !== userId) throw new ForbiddenException("У вас нет прав на обновление этого ответа.")
-        //
-        // answer.title = questionDto.title // TODO: тут завязано на код, надо бы answerDto использовать ,что передано, все обновлять
-        // await this.answerRepository.update(answerDto.id, answer)
-        //
-        // if (isReturnUpdatedData) return await this.answerRepository.findOneBy({id: answerDto.id})
-        // return null
     }
 
     updateQuestionObjectFromDto(question: Question, questionDto: UpdateQuestionDto): void {

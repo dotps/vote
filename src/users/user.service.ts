@@ -13,7 +13,6 @@ export class UserService {
     constructor(
         @InjectRepository(User)
         private readonly repository: Repository<User>,
-        // private readonly authService: AuthService
         private readonly tokenService: TokenService
     ) {}
 
@@ -23,7 +22,6 @@ export class UserService {
         // TODO: здесь ошибка
         const token = await this.tokenService.generateToken(user)
         return new AuthDto(user, token)
-        // return
     }
 
     async getAll(): Promise<User[]> {
