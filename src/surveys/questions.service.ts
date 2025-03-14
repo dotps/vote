@@ -5,6 +5,7 @@ import {CreateQuestionDto, UpdateQuestionDto} from "./create-survey.dto"
 import {Question} from "./question.entity"
 import {DBError} from "../errors/DBError"
 import {Survey} from "./survey.entity"
+import {Errors, ErrorsMessages} from "../errors/errors"
 
 @Injectable()
 export class QuestionsService {
@@ -37,8 +38,8 @@ export class QuestionsService {
             select: ["createdBy"],
             where: {id: surveyId}
         })
-        if (!survey) throw new NotFoundException(`Опрос id=${surveyId} не найден.`)
-        if (survey?.createdBy !== userId) throw new ForbiddenException("У вас нет прав на добавление вопроса к этому опросу.")
+        if (!survey) throw new NotFoundException(Errors.displayId(surveyId) + ErrorsMessages.SURVEY_NOT_FOUND)
+        if (survey?.createdBy !== userId) throw new ForbiddenException(ErrorsMessages.QUESTION_ADD_FORBIDDEN)
     }
 
     async updateQuestion(userId: number, surveyId: number, questionDto: UpdateQuestionDto, checkCanUserCreateQuestion: boolean = false) {

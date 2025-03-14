@@ -16,6 +16,7 @@ import {Question} from "./question.entity"
 import {Answer} from "./answer.entity"
 import {AnswersService} from "./answers.service"
 import {QuestionsService} from "./questions.service"
+import {Errors, ErrorsMessages} from "../errors/errors"
 
 @Injectable()
 export class SurveysService {
@@ -38,7 +39,7 @@ export class SurveysService {
 
     async getAllSurveys(): Promise<Survey[]> {
         const surveys = await this.surveyRepository.find()
-        if (surveys.length === 0) throw new NotFoundException()
+        if (surveys.length === 0) throw new NotFoundException(ErrorsMessages.SURVEY_NOT_FOUND)
         return surveys
     }
 
@@ -47,16 +48,16 @@ export class SurveysService {
             where: {id: id},
             relations: ["questions", "questions.answers"],
         })
-        if (!survey) throw new NotFoundException("Опрос не найден.")
+        if (!survey) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.SURVEY_NOT_FOUND)
         return survey
     }
 
     async saveUserSurveyResult(userId: number, surveyId: number, data: SaveSurveyResultDto): Promise<SurveyResult[]> {
-        if (data.questions.length === 0) throw new BadRequestException() // TODO: можно ли через ValidationPipe проверить количество?
+        if (data.questions.length === 0) throw new BadRequestException(ErrorsMessages.QUESTIONS_NOT_EMPTY) // TODO: можно ли через ValidationPipe проверить количество?
 
         const saveResults: SurveyResult[] = []
         for (const question of data.questions) {
-            if (question.answers.length === 0) throw new BadRequestException()
+            if (question.answers.length === 0) throw new BadRequestException(ErrorsMessages.ANSWERS_NOT_EMPTY)
 
             for (const answer of question.answers) {
                 try {
@@ -94,7 +95,7 @@ export class SurveysService {
             .orderBy("question.id, answer.id")
             .getRawMany()
 
-        if (!results || results.length === 0) throw new NotFoundException()
+        if (!results || results.length === 0) throw new NotFoundException(ErrorsMessages.SURVEY_RESULTS_NOT_FOUND)
         return results as SurveyResultResponse[]
     }
 
@@ -105,7 +106,7 @@ export class SurveysService {
     async updateSurvey(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
 
         const survey = await this.getSurvey(surveyId)
-        if (survey.createdBy !== userId) throw new ForbiddenException()
+        if (survey.createdBy !== userId) throw new ForbiddenException(ErrorsMessages.SURVEY_UPDATE_FORBIDDEN)
 
         const {questions: questionsDto, ...surveyFields} = surveyDto
         this.updateSurveyFields(survey, surveyFields)
@@ -150,14 +151,14 @@ export class SurveysService {
 
     private updateAnswer(answers: Answer[], answerDto: UpdateAnswerDto): Answer {
         const answer = answers.find(a => a.id === answerDto.id)
-        if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
+        if (!answer) throw new NotFoundException(Errors.displayId(answerDto.id) + ErrorsMessages.ANSWER_NOT_FOUND)
         this.answersService.updateAnswerObjectFromDto(answer, answerDto)
         return answer
     }
 
     private updateQuestion(questions: Question[], questionDto: UpdateQuestionDto): Question {
         const question = questions.find(q => q.id === questionDto.id)
-        if (!question) throw new NotFoundException(`Вопрос id=${questionDto.id} не найден.`)
+        if (!question) throw new NotFoundException(Errors.displayId(questionDto.id) + ErrorsMessages.QUESTION_NOT_FOUND)
         this.questionsService.updateQuestionObjectFromDto(question, questionDto)
         return question
     }

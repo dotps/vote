@@ -1,5 +1,5 @@
 import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator"
-import { ValidationGroup } from "../ValidationGroup"
+import { ValidationGroup } from "../validation/ValidationGroup"
 
 export class UserDto {
     @IsNotEmpty({ groups: [ValidationGroup.CREATE, ValidationGroup.UPDATE, ValidationGroup.AUTH] })
