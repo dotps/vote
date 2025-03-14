@@ -1,33 +1,36 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm"
-import { Question } from "./question.entity"
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, UpdateDateColumn} from "typeorm"
+import {Question} from "./question.entity"
 import {SurveyResult} from "./survey-result.entity"
 
 @Entity()
 export class Survey {
-  @PrimaryGeneratedColumn()
-  id: number
+    @PrimaryGeneratedColumn()
+    id: number
 
-  @Column()
-  title: string
+    @Column()
+    title: string
 
-  @Column()
-  description: string
+    @Column()
+    description: string
 
-  @OneToMany(() => Question, (question) => question.survey, {
-    cascade: true,
-    onDelete: "CASCADE"
-  })
-  questions: Question[]
+    @OneToMany(() => Question, (question) => question.survey, {
+        cascade: true,
+        onDelete: "CASCADE"
+    })
+    questions: Question[]
 
-  @CreateDateColumn()
-  createdAt: Date
+    @CreateDateColumn()
+    createdAt: Date
 
-  @UpdateDateColumn()
-  updatedAt: Date
+    @UpdateDateColumn()
+    updatedAt: Date
 
-  @OneToMany(() => SurveyResult, (result) => result.survey)
-  results: SurveyResult[]
+    @OneToMany(() => SurveyResult, (result) => result.survey)
+    results: SurveyResult[]
 
-  @Column()
-  createdBy: number
+    @Column()
+    createdBy: number
+
+    @Column({default: true})
+    enabled: boolean
 }

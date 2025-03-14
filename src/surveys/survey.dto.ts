@@ -1,6 +1,7 @@
 export interface ISurveyDto {
     title?: string
     description?: string
+    enabled?: boolean
     questions: IQuestionDto[]
     // createdBy: number
 }

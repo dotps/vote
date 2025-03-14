@@ -3,10 +3,7 @@ import {InjectRepository} from "@nestjs/typeorm"
 import {Repository} from "typeorm"
 import {Survey} from "./survey.entity"
 import {
-    CreateSurveyDto,
-    UpdateAnswerDto,
-    UpdateQuestionDto,
-    UpdateSurveyDto
+    CreateSurveyDto
 } from "./create-survey.dto"
 import {SaveSurveyResultDto} from "./save-survey-result.dto"
 import {SurveyResult} from "./survey-result.entity"
@@ -17,6 +14,8 @@ import {Answer} from "./answer.entity"
 import {AnswersService} from "./answers.service"
 import {QuestionsService} from "./questions.service"
 import {Errors, ErrorsMessages} from "../errors/errors"
+import {ResponseResult, Responses} from "../responses/Responses"
+import {UpdateAnswerDto, UpdateQuestionDto, UpdateSurveyDto} from "./update-survey.dto"
 
 @Injectable()
 export class SurveysService {
@@ -37,21 +36,25 @@ export class SurveysService {
         return await this.surveyRepository.save(survey)
     }
 
+    // TODO: добавить что отлько окрытые для просмотра опроса доступны
     async getAllSurveys(): Promise<Survey[]> {
         const surveys = await this.surveyRepository.find()
         if (surveys.length === 0) throw new NotFoundException(ErrorsMessages.SURVEY_NOT_FOUND)
         return surveys
     }
 
-    async getSurvey(id: number): Promise<Survey> {
+    // TODO: добавить что отлько окрытые для просмотра опроса доступны
+    async getSurvey(id: number, isExcludeRelations: boolean = false): Promise<Survey> {
+        const relations = isExcludeRelations ? [] : ["questions", "questions.answers"]
         const survey = await this.surveyRepository.findOne({
             where: {id: id},
-            relations: ["questions", "questions.answers"],
+            relations: relations,
         })
         if (!survey) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.SURVEY_NOT_FOUND)
         return survey
     }
 
+    // TODO: добавить что отлько окрытые для просмотра опроса доступны
     async saveUserSurveyResult(userId: number, surveyId: number, data: SaveSurveyResultDto): Promise<SurveyResult[]> {
         if (data.questions.length === 0) throw new BadRequestException(ErrorsMessages.QUESTIONS_NOT_EMPTY) // TODO: можно ли через ValidationPipe проверить количество?
 
@@ -103,6 +106,7 @@ export class SurveysService {
         data["createdBy"] = userId
     }
 
+    // TODO: добавить что отлько окрытые для просмотра опроса доступны
     async updateSurvey(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
 
         const survey = await this.getSurvey(surveyId)
@@ -115,6 +119,7 @@ export class SurveysService {
         await this.surveyRepository.save(survey)
     }
 
+    // TODO: добавить что отлько окрытые для просмотра опроса доступны
     private updateQuestionsInSurvey(questions: Question[], questionsDto: UpdateQuestionDto[]) {
         for (const questionDto of questionsDto) {
             if (questionDto.id) {
@@ -161,6 +166,19 @@ export class SurveysService {
         if (!question) throw new NotFoundException(Errors.displayId(questionDto.id) + ErrorsMessages.QUESTION_NOT_FOUND)
         this.questionsService.updateQuestionObjectFromDto(question, questionDto)
         return question
+    }
+
+    async setSurveyActive(userId: number, surveyId: number, status: boolean): Promise<ResponseResult> {
+        const isExcludeRelations = true
+        const survey = await this.getSurvey(surveyId, isExcludeRelations)
+        if (survey.createdBy !== userId) throw new ForbiddenException(ErrorsMessages.SURVEY_UPDATE_FORBIDDEN)
+
+        const surveyForUpdate = this.surveyRepository.create({
+            enabled: status,
+        })
+
+        const result = await this.surveyRepository.update(surveyId, surveyForUpdate)
+        return Responses.update(result)
     }
 }
 

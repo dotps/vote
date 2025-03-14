@@ -13,12 +13,17 @@ import {
 import {SurveyResultResponse, SurveysService} from "./surveys.service"
 import {Survey} from "./survey.entity"
 import {SaveSurveyResultDto} from "./save-survey-result.dto"
-import {CreateAnswerDto, CreateSurveyDto, UpdateAnswerDto, UpdateSurveyDto} from "./create-survey.dto"
+import {
+    CreateAnswerDto,
+    CreateSurveyDto
+} from "./create-survey.dto"
 import {SurveyResult} from "./survey-result.entity"
 import {Answer} from "./answer.entity"
 import {AnswersService} from "./answers.service"
 import {CurrentUser} from "../users/current-user.decorator"
 import {User} from "../users/user.entity"
+import {ResponseResult} from "../responses/Responses"
+import {UpdateAnswerDto, UpdateSurveyDto, UpdateSurveyStatusDto} from "./update-survey.dto"
 
 @Controller("surveys")
 export class SurveysController {
@@ -95,5 +100,15 @@ export class SurveysController {
     ): Promise<Answer> {
         const checkUserCanCreateAnswer = true
         return await this.answersService.createAnswer(user.id, surveyId, questionId, data, checkUserCanCreateAnswer)
+    }
+
+    @Patch(":surveyId/status")
+    @UsePipes(ValidationPipe)
+    async setSurveyActive(
+        @Param("surveyId", ParseIntPipe) surveyId: number,
+        @Body() data: UpdateSurveyStatusDto,
+        @CurrentUser() user: User
+    ): Promise<ResponseResult> {
+        return await this.surveysService.setSurveyActive(user.id, surveyId, data.status)
     }
 }

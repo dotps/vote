@@ -1,10 +1,11 @@
 import {ForbiddenException, Injectable, NotFoundException} from "@nestjs/common"
 import {InjectRepository} from "@nestjs/typeorm"
 import {Repository} from "typeorm"
-import {CreateAnswerDto, UpdateAnswerDto} from "./create-survey.dto"
+import {CreateAnswerDto} from "./create-survey.dto"
 import {Answer} from "./answer.entity"
 import {Question} from "./question.entity"
 import {DBError} from "../errors/DBError"
+import {UpdateAnswerDto} from "./update-survey.dto"
 
 @Injectable()
 export class AnswersService {
