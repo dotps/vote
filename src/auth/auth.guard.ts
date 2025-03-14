@@ -5,6 +5,7 @@ import { IS_PUBLIC_KEY } from "./public.decorator"
 import { TokenService } from "./token.service"
 import { UserService } from "../users/user.service"
 import { User } from "../users/user.entity"
+import {ErrorsMessages} from "../errors/errors"
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -20,7 +21,7 @@ export class AuthGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest()
     const token = this.getTokenFromHeader(request)
-    if (!token) throw new UnauthorizedException("Отсутствует токен")
+    if (!token) throw new UnauthorizedException(ErrorsMessages.AUTH_TOKEN_NOT_FOUND)
 
     try {
       const userId = await this.getUserIdFromToken(token)
@@ -41,7 +42,7 @@ export class AuthGuard implements CanActivate {
   async getUserIdFromToken(token: string): Promise<number> {
     const decodedToken = await this.tokenService.verifyToken(token)
     const userId = Number(decodedToken.sub) || undefined
-    if (!userId) throw new UnauthorizedException("Пользователь в токене не обнаружен")
+    if (!userId) throw new UnauthorizedException(ErrorsMessages.AUTH_TOKEN_USER_NOT_FOUND)
     return userId
   }
 

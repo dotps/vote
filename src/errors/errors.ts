@@ -10,6 +10,9 @@ export enum ErrorsMessages {
     QUESTIONS_NOT_EMPTY = "Вопросы не должны быть пустыми.",
     ANSWER_NOT_FOUND = "Ответ не найден.",
     ANSWERS_NOT_EMPTY = "Ответы не должны быть пустыми.",
+    AUTH_TOKEN_NOT_FOUND = "Отсутствует токен.",
+    AUTH_TOKEN_USER_NOT_FOUND = "Пользователь в токене не обнаружен.",
+    AUTH_WRONG_DATA = "Неверные данные для авторизации.",
 }
 
 export class Errors {
