@@ -6,8 +6,12 @@ import { Public } from "./public.decorator"
 import { ValidationGroup } from "../validation/ValidationGroup"
 import {CurrentUser} from "../users/current-user.decorator"
 import {User} from "../users/user.entity"
+import { ApiResponse, ApiTags } from "@nestjs/swagger"
+import { ApiAuthLogin } from "../swagger.decorator"
+import { AuthDto } from "./auth.dto"
 
 @Controller("auth")
+@ApiTags("auth")
 export class AuthController {
 
   constructor(private readonly authService: AuthService) {
@@ -17,12 +21,16 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post("login")
   @UsePipes(new ValidationPipe({ groups: [ValidationGroup.AUTH] }))
-  signIn(@Body() user: UserDto) {
+  @ApiAuthLogin()
+  signIn(@Body() user: UserDto): Promise<AuthDto> {
     return this.authService.signIn(user.name, user.password)
   }
 
   @Get("profile")
-  getProfile(@CurrentUser() user: User) {
+  @ApiResponse({ status: 200, description: "Данные пользователя.", type: User })
+  @ApiResponse({ status: 401, description: "Требуется авторизация." })
+  getProfile(@CurrentUser() user: User): User {
+    // TODO: добавить dto много лишнего отдается
     return user
   }
 }

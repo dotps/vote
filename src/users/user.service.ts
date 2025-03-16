@@ -28,14 +28,16 @@ export class UserService {
         return this.repository.find()
     }
 
-    async getUser(id: number): Promise<User | null> {
+    async getUser(id: number): Promise<User> {
         const user = await this.repository.findOneBy({id})
         if (!user) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.USER_NOT_FOUND)
         return user
     }
 
-    async getUserByName(name: string): Promise<User | null> {
-        return this.repository.findOneBy({name: name.trim()})
+    async getUserByName(name: string): Promise<User> {
+        const user = await this.repository.findOneBy({name: name.trim()})
+        if (!user) throw new NotFoundException(ErrorsMessages.USER_NOT_FOUND)
+        return user
     }
 
     async deleteUser(id: number): Promise<void> {

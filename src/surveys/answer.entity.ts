@@ -10,13 +10,16 @@ import {
 } from "typeorm"
 import { Question } from "./question.entity"
 import {SurveyResult} from "./survey-result.entity"
+import { ApiProperty } from "@nestjs/swagger"
 
 @Entity()
 export class Answer {
   @PrimaryGeneratedColumn()
+  @ApiProperty({ description: "ID" })
   id: number
 
   @Column()
+  @ApiProperty({ description: "Заголовок" })
   title: string
 
   @ManyToOne(() => Question, (question) => question.answers)
@@ -30,8 +33,10 @@ export class Answer {
   results: SurveyResult[]
 
   @CreateDateColumn()
+  @ApiProperty({ description: "Дата создания" })
   createdAt: Date
 
   @UpdateDateColumn()
+  @ApiProperty({ description: "Дата обновления" })
   updatedAt: Date
 }

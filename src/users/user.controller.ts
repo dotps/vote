@@ -19,9 +19,10 @@ import {AuthDto} from "../auth/auth.dto"
 import {CurrentUser} from "./current-user.decorator"
 import {ErrorsMessages} from "../errors/errors"
 import {ApiBody, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger"
+import { ApiCreateUser } from "../swagger.decorator"
 
-@ApiTags("users")
 @Controller("users")
+@ApiTags("users")
 export class UserController {
 
     constructor(private readonly userService: UserService) {
@@ -30,17 +31,14 @@ export class UserController {
     @Public()
     @Post()
     @UsePipes(new ValidationPipe({groups: [ValidationGroup.CREATE]}))
-    @ApiOperation({summary: "Создание нового пользователя."})
-    @ApiResponse({status: 201, description: "Пользователь успешно создан.", type: AuthDto})
-    @ApiResponse({status: 400, description: "Неверные данные."})
-    @ApiBody({type: UserDto})
+    @ApiCreateUser()
     // TODO: продолжить делать документацию swagger
-        // TODO: можно ли сделать единый декоратор @ApiCreateUser() для описания api
     async create(@Body() data: UserDto): Promise<AuthDto> {
         return await this.userService.createUser(data)
     }
 
     @Put(":id")
+    @ApiResponse({ status: 401, description: "Требуется авторизация." })
     @UsePipes(new ValidationPipe({groups: [ValidationGroup.UPDATE]}))
     async update(
         @Param("id", ParseIntPipe) id: number,
@@ -52,6 +50,7 @@ export class UserController {
     }
 
     @Patch(":id")
+    @ApiResponse({ status: 401, description: "Требуется авторизация." })
     @UsePipes(new ValidationPipe({groups: [ValidationGroup.PARTIAL_UPDATE]}))
     async partialUpdate(
         @Param("id", ParseIntPipe) id: number,
