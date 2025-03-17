@@ -7,7 +7,7 @@ import { ValidationGroup } from "../validation/ValidationGroup"
 import {CurrentUser} from "../users/current-user.decorator"
 import {User} from "../users/user.entity"
 import { ApiResponse, ApiTags } from "@nestjs/swagger"
-import { ApiAuthLogin } from "../swagger.decorator"
+import {ApiAuthLogin, ApiAuthProfile} from "../swagger.decorator"
 import { AuthDto } from "./auth.dto"
 
 @Controller("auth")
@@ -27,8 +27,7 @@ export class AuthController {
   }
 
   @Get("profile")
-  @ApiResponse({ status: 200, description: "Данные пользователя.", type: User })
-  @ApiResponse({ status: 401, description: "Требуется авторизация." })
+  @ApiAuthProfile()
   getProfile(@CurrentUser() user: User): User {
     // TODO: добавить dto много лишнего отдается
     return user

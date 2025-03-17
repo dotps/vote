@@ -24,10 +24,6 @@ export class UserService {
         return new AuthDto(user, token)
     }
 
-    async getAll(): Promise<User[]> {
-        return this.repository.find()
-    }
-
     async getUser(id: number): Promise<User> {
         const user = await this.repository.findOneBy({id})
         if (!user) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.USER_NOT_FOUND)
@@ -40,14 +36,18 @@ export class UserService {
         return user
     }
 
-    async deleteUser(id: number): Promise<void> {
-        const result = await this.repository.delete(id)
-        if (!result.affected) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.NOT_FOUND)
-    }
-
     async updateUser(id: number, data: UserDto): Promise<User> {
         const result = await this.repository.update(id, data)
         if (!result.affected) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.NOT_FOUND)
         return await this.getUser(id)
+    }
+
+    async getAll(): Promise<User[]> {
+        return this.repository.find()
+    }
+
+    async deleteUser(id: number): Promise<void> {
+        const result = await this.repository.delete(id)
+        if (!result.affected) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.NOT_FOUND)
     }
 }

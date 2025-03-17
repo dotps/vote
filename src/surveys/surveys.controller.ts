@@ -72,6 +72,7 @@ export class SurveysController {
     // TODO: протестировать после замены типа на класс
   }
 
+  // TODO: продолжить описание
   @Post(":id")
   @UsePipes(ValidationPipe)
   @ApiSaveSurveyResult()

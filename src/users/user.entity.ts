@@ -22,4 +22,8 @@ export class User {
 
     @OneToMany(() => SurveyResult, (result) => result.user)
     surveyResults: SurveyResult[]
+
+    isSelf(id: number): boolean {
+        return this.id === id
+    }
 }
