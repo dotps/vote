@@ -2,12 +2,14 @@ import {applyDecorators} from "@nestjs/common"
 import {ApiOperation, ApiResponse, ApiBody, ApiParam, getSchemaPath} from "@nestjs/swagger"
 import {UserDto} from "./users/user.dto"
 import {AuthDto} from "./auth/auth.dto"
-import {CreateSurveyDto} from "./surveys/create-survey.dto"
+import {CreateAnswerDto, CreateSurveyDto} from "./surveys/create-survey.dto"
 import {Survey} from "./surveys/survey.entity"
 import {SurveyResultResponse} from "./surveys/surveys.service"
 import {SaveSurveyResultDto} from "./surveys/save-survey-result.dto"
 import {SurveyResult} from "./surveys/survey-result.entity"
 import {User} from "./users/user.entity"
+import {UpdateAnswerDto, UpdateSurveyDto} from "./surveys/update-survey.dto"
+import {Answer} from "./surveys/answer.entity"
 
 export function ApiCreateUser() {
     return applyDecorators(
@@ -63,6 +65,21 @@ export function ApiCreateSurvey() {
     )
 }
 
+export function ApiUpdateSurvey() {
+    return applyDecorators(
+        ApiOperation({
+            summary: "Обновить данные опроса.",
+            description: "Обновляет только то, что передано. Непереданные вопросы и ответы не удаляются."
+        }),
+        ApiResponse({status: 200, description: "Опрос успешно обновлен.", type:  Survey}),
+        ApiResponse({status: 400, description: "Неверные данные. Валидация данных по типу и содержимому."}),
+        ApiResponse({status: 401, description: "Требуется авторизация."}),
+        ApiResponse({status: 403, description: "Пользователь может обновить только свой опрос."}),
+        ApiResponse({status: 404, description: "Опрос не найден."}),
+        ApiBody({type: UpdateSurveyDto}),
+    )
+}
+
 export function ApiGetAllSurveys() {
     return applyDecorators(
         ApiOperation({
@@ -102,7 +119,10 @@ export function ApiGetSurveyResult() {
 
 export function ApiSaveSurveyResult() {
     return applyDecorators(
-        ApiOperation({summary: "Сохранить результаты опроса."}),
+        ApiOperation({
+            summary: "Сохранить результаты опроса.",
+            description: "Сохранение всех переданных ответов на вопросы для опроса, доступного для взаимодействия.",
+        }),
         ApiParam({name: "id", type: Number, description: "ID опроса, целое число"}),
         ApiBody({type: SaveSurveyResultDto}),
         ApiResponse({status: 200, description: "", isArray: true, type: SurveyResult}),
@@ -135,3 +155,32 @@ export function ApiAuthProfile() {
         ApiResponse({status: 401, description: "Требуется авторизация."}),
     )
 }
+
+export function ApiUpdateAnswer() {
+    return applyDecorators(
+        ApiOperation({
+            summary: "Обновить ответ.",
+            description: "Для обновления ответа, необходимо отправить (имя, email, пароль). Все поля обязательны."
+        }),
+        ApiResponse({status: 200, description: "Ответ успешно обновлен.", type: Answer}),
+        ApiResponse({status: 400, description: "Неверные данные. Валидация данных по типу и содержимому."}),
+        ApiResponse({status: 401, description: "Требуется авторизация."}),
+        ApiResponse({status: 403, description: "Пользователь может обновить только свой опрос и связанные с ним данные."}),
+        ApiResponse({status: 404, description: "Ответ не найден."}),
+        ApiBody({type: CreateAnswerDto}),
+    )
+}
+
+export function ApiCreateAnswer() {
+    // TODO: продолжить
+    return applyDecorators(
+        ApiOperation({
+            summary: "Создание нового пользователя.",
+            description: "Для создания пользователя, необходимо отправить (имя, email, пароль), возвращается JWT-токен для дальнейшего доступа к системе."
+        }),
+        ApiResponse({status: 201, description: "Пользователь успешно создан.", type: AuthDto}),
+        ApiResponse({status: 400, description: "Неверные данные. Валидация данных по типу и содержимому."}),
+        ApiBody({type: UserDto}),
+    )
+}
+

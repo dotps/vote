@@ -40,6 +40,7 @@ export class AnswersService {
         const answer = await this.getAnswerWithSurveyHierarchy(answerDto)
 
         if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
+        // TODO: вместо userId: number, передать user и заменить на user.isSelf(survey.createdBy), таких мест много
         if (answer?.question?.survey?.id !== surveyId || answer?.question?.survey?.createdBy !== userId) throw new ForbiddenException("У вас нет прав на обновление этого ответа.")
 
         this.updateAnswerObjectFromDto(answer, answerDto)

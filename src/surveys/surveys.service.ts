@@ -113,7 +113,7 @@ export class SurveysService {
         data["createdBy"] = userId
     }
 
-    async updateSurvey(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<void> {
+    async updateSurvey(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<Survey> {
 
         const survey = await this.getSurvey(surveyId)
         if (survey.createdBy !== userId) throw new ForbiddenException(ErrorsMessages.SURVEY_UPDATE_FORBIDDEN)
@@ -122,9 +122,10 @@ export class SurveysService {
         this.updateSurveyFields(survey, surveyFields)
         this.updateQuestionsInSurvey(survey.questions, questionsDto)
 
-        await this.surveyRepository.save(survey)
+        return await this.surveyRepository.save(survey)
     }
 
+    // TODO: вынести методы ниже в отдельный сервис UpdateSurveyService
     private updateQuestionsInSurvey(questions: Question[], questionsDto: UpdateQuestionDto[]) {
         for (const questionDto of questionsDto) {
             if (questionDto.id) {
@@ -175,6 +176,7 @@ export class SurveysService {
 
     async setSurveyActive(userId: number, surveyId: number, status: boolean): Promise<ResponseResult> {
         const survey = await this.getSurvey(surveyId, {isExcludeRelations: true})
+        // TODO: вместо userId: number, передать user и заменить на user.isSelf(survey.createdBy), таких мест много
         if (survey.createdBy !== userId) throw new ForbiddenException(ErrorsMessages.SURVEY_UPDATE_FORBIDDEN)
 
         const surveyForUpdate = this.surveyRepository.create({
