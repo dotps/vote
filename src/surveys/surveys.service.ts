@@ -16,7 +16,8 @@ import {QuestionsService} from "./questions.service"
 import {Errors, ErrorsMessages} from "../errors/errors"
 import {ResponseUpdateDto, Responses} from "../responses/Responses"
 import {UpdateAnswerDto, UpdateQuestionDto, UpdateSurveyDto} from "./update-survey.dto"
-import { ApiProperty } from "@nestjs/swagger"
+import {ApiProperty} from "@nestjs/swagger"
+import {User} from "../users/user.entity"
 
 @Injectable()
 export class SurveysService {
@@ -31,15 +32,15 @@ export class SurveysService {
     ) {
     }
 
-    async createSurvey(data: CreateSurveyDto, userId: number): Promise<Survey> {
-        this.addCreatedByUser(data, userId)
+    async createSurvey(data: CreateSurveyDto, user: User): Promise<Survey> {
+        this.addCreatedByUser(data, user.id)
         const survey = this.surveyRepository.create(data)
         return await this.surveyRepository.save(survey)
     }
 
     async getAllSurveys(): Promise<Survey[]> {
         const surveys = await this.surveyRepository.find({
-            where: { enabled: true }
+            where: {enabled: true}
         })
         if (surveys.length === 0) throw new NotFoundException(ErrorsMessages.SURVEY_NOT_FOUND)
         return surveys
@@ -58,7 +59,7 @@ export class SurveysService {
         return survey
     }
 
-    async saveUserSurveyResult(userId: number, surveyId: number, data: SaveSurveyResultDto): Promise<SurveyResult[]> {
+    async saveUserSurveyResult(user: User, surveyId: number, data: SaveSurveyResultDto): Promise<SurveyResult[]> {
 
         const survey = await this.getSurvey(surveyId, {isExcludeRelations: true, enabled: true})
         if (!survey) throw new NotFoundException(Errors.displayId(surveyId) + ErrorsMessages.SURVEY_NOT_FOUND)
@@ -73,7 +74,7 @@ export class SurveysService {
                 try {
                     const surveyResult = this.resultRepository.create({
                         surveyId: surveyId,
-                        userId: userId,
+                        userId: user.id,
                         questionId: question.id,
                         answerId: answer.id,
                     })
@@ -113,10 +114,10 @@ export class SurveysService {
         data["createdBy"] = userId
     }
 
-    async updateSurvey(surveyDto: UpdateSurveyDto, userId: number, surveyId: number): Promise<Survey> {
+    async updateSurvey(surveyDto: UpdateSurveyDto, user: User, surveyId: number): Promise<Survey> {
 
         const survey = await this.getSurvey(surveyId)
-        if (survey.createdBy !== userId) throw new ForbiddenException(ErrorsMessages.SURVEY_UPDATE_FORBIDDEN)
+        if (!user.isSelf(survey?.createdBy)) throw new ForbiddenException(ErrorsMessages.SURVEY_UPDATE_FORBIDDEN)
 
         const {questions: questionsDto, ...surveyFields} = surveyDto
         this.updateSurveyFields(survey, surveyFields)
@@ -174,10 +175,9 @@ export class SurveysService {
         return question
     }
 
-    async setSurveyActive(userId: number, surveyId: number, status: boolean): Promise<ResponseUpdateDto> {
+    async setSurveyActive(user: User, surveyId: number, status: boolean): Promise<ResponseUpdateDto> {
         const survey = await this.getSurvey(surveyId, {isExcludeRelations: true})
-        // TODO: вместо userId: number, передать user и заменить на user.isSelf(survey.createdBy), таких мест много
-        if (survey.createdBy !== userId) throw new ForbiddenException(ErrorsMessages.SURVEY_UPDATE_FORBIDDEN)
+        if (!user.isSelf(survey?.createdBy)) throw new ForbiddenException(ErrorsMessages.SURVEY_UPDATE_FORBIDDEN)
 
         const surveyForUpdate = this.surveyRepository.create({
             enabled: status,
@@ -210,18 +210,18 @@ export type SurveyResultResponse = {
 }*/
 
 export class SurveyResultResponse {
-    @ApiProperty({ description: "ID опроса" })
+    @ApiProperty({description: "ID опроса"})
     surveyId: number
-    @ApiProperty({ description: "Заголовок опроса" })
+    @ApiProperty({description: "Заголовок опроса"})
     surveyTitle: string
-    @ApiProperty({ description: "ID вопроса" })
+    @ApiProperty({description: "ID вопроса"})
     questionId: number
-    @ApiProperty({ description: "Заголовок вопроса" })
+    @ApiProperty({description: "Заголовок вопроса"})
     questionTitle: string
-    @ApiProperty({ description: "ID ответа" })
+    @ApiProperty({description: "ID ответа"})
     answerId: number
-    @ApiProperty({ description: "Заголовок ответа" })
+    @ApiProperty({description: "Заголовок ответа"})
     answerTitle: string
-    @ApiProperty({ description: "Сколько раз был выбран данный ответ" })
+    @ApiProperty({description: "Сколько раз был выбран данный ответ"})
     answerCount: number
 }

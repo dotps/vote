@@ -50,7 +50,7 @@ export class SurveysController {
     @ApiCreateSurvey()
     @ApiBearerAuth()
     async createSurvey(@Body() data: CreateSurveyDto, @CurrentUser() user: User): Promise<Survey> {
-        return await this.surveysService.createSurvey(data, user.id)
+        return await this.surveysService.createSurvey(data, user)
     }
 
     @Get()
@@ -80,7 +80,7 @@ export class SurveysController {
         @Body() data: SaveSurveyResultDto,
         @CurrentUser() user: User,
     ): Promise<SurveyResult[]> {
-        return await this.surveysService.saveUserSurveyResult(user.id, id, data)
+        return await this.surveysService.saveUserSurveyResult(user, id, data)
     }
 
     @Put(":id")
@@ -91,7 +91,7 @@ export class SurveysController {
         @Body() data: UpdateSurveyDto,
         @CurrentUser() user: User,
     ): Promise<Survey> {
-        return await this.surveysService.updateSurvey(data, user.id, id)
+        return await this.surveysService.updateSurvey(data, user, id)
     }
 
     @Patch([
@@ -110,7 +110,7 @@ export class SurveysController {
             ...data,
             id: answerId,
         }
-        return await this.answersService.updateAnswer(user.id, surveyId, answerDto)
+        return await this.answersService.updateAnswer(user, surveyId, answerDto)
     }
 
     @Post(":surveyId/questions/:questionId/answers")
@@ -123,7 +123,7 @@ export class SurveysController {
         @CurrentUser() user: User,
     ): Promise<Answer> {
         const checkUserCanCreateAnswer = true
-        return await this.answersService.createAnswer(user.id, surveyId, questionId, data, checkUserCanCreateAnswer)
+        return await this.answersService.createAnswer(user, surveyId, questionId, data, checkUserCanCreateAnswer)
     }
 
     @Patch(":surveyId/status")
@@ -134,6 +134,6 @@ export class SurveysController {
         @Body() data: UpdateSurveyStatusDto,
         @CurrentUser() user: User,
     ): Promise<ResponseUpdateDto> {
-        return await this.surveysService.setSurveyActive(user.id, surveyId, data.status)
+        return await this.surveysService.setSurveyActive(user, surveyId, data.status)
     }
 }

@@ -7,6 +7,7 @@ import {DBError} from "../errors/DBError"
 import {Survey} from "./survey.entity"
 import {Errors, ErrorsMessages} from "../errors/errors"
 import {UpdateQuestionDto} from "./update-survey.dto"
+import {User} from "../users/user.entity"
 
 @Injectable()
 export class QuestionsService {
@@ -19,8 +20,8 @@ export class QuestionsService {
     ) {
     }
 
-    async createQuestion(userId: number, surveyId: number, data: CreateQuestionDto, checkCanUserCreateQuestion: boolean = false): Promise<Question> {
-        if (checkCanUserCreateQuestion) await this.checkCanUserCreateQuestionOrThrowError(userId, surveyId)
+    async createQuestion(user: User, surveyId: number, data: CreateQuestionDto, checkCanUserCreateQuestion: boolean = false): Promise<Question> {
+        if (checkCanUserCreateQuestion) await this.checkCanUserCreateQuestionOrThrowError(user, surveyId)
 
         const question = this.questionRepository.create({
             ...data,
@@ -34,17 +35,17 @@ export class QuestionsService {
         }
     }
 
-    async checkCanUserCreateQuestionOrThrowError(userId: number, surveyId: number): Promise<void> {
+    async checkCanUserCreateQuestionOrThrowError(user: User, surveyId: number): Promise<void> {
         const survey = await this.surveyRepository.findOne({
             select: ["createdBy"],
             where: {id: surveyId}
         })
         if (!survey) throw new NotFoundException(Errors.displayId(surveyId) + ErrorsMessages.SURVEY_NOT_FOUND)
-        if (survey?.createdBy !== userId) throw new ForbiddenException(ErrorsMessages.QUESTION_ADD_FORBIDDEN)
+        if (!user.isSelf(survey?.createdBy)) throw new ForbiddenException(ErrorsMessages.QUESTION_ADD_FORBIDDEN)
     }
 
-    async updateQuestion(userId: number, surveyId: number, questionDto: UpdateQuestionDto, checkCanUserCreateQuestion: boolean = false) {
-        if (checkCanUserCreateQuestion) await this.checkCanUserCreateQuestionOrThrowError(userId, surveyId)
+    async updateQuestion(user: User, surveyId: number, questionDto: UpdateQuestionDto, checkCanUserCreateQuestion: boolean = false) {
+        if (checkCanUserCreateQuestion) await this.checkCanUserCreateQuestionOrThrowError(user, surveyId)
         questionDto.answers = undefined
 
         try {

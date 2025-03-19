@@ -1,21 +1,21 @@
 import {IsArray, IsNotEmpty, IsString, ValidateNested} from "class-validator"
 import {Type} from "class-transformer"
 import {IAnswerDto, IQuestionDto, ISurveyDto} from "./survey.dto"
-import { ApiProperty } from "@nestjs/swagger"
+import {ApiProperty} from "@nestjs/swagger"
 
 export class CreateSurveyDto implements ISurveyDto {
     @IsNotEmpty()
     @IsString()
-    @ApiProperty({ description: "Заголовок" })
+    @ApiProperty({description: "Заголовок"})
     title: string
 
     @IsNotEmpty()
     @IsString()
-    @ApiProperty({ description: "Текст опроса" })
+    @ApiProperty({description: "Текст опроса"})
     description: string
 
     @IsArray()
-    @ValidateNested({ each: true })
+    @ValidateNested({each: true})
     @Type(() => CreateQuestionDto)
     @ApiProperty({
         description: "Массив объектов с вопросами",
@@ -28,11 +28,11 @@ export class CreateSurveyDto implements ISurveyDto {
 export class CreateQuestionDto implements IQuestionDto {
     @IsNotEmpty()
     @IsString()
-    @ApiProperty({ description: "Заголовок" })
+    @ApiProperty({description: "Заголовок"})
     title: string
 
     @IsArray()
-    @ValidateNested({ each: true })
+    @ValidateNested({each: true})
     @Type(() => CreateAnswerDto)
     @ApiProperty({
         description: "Массив объектов с ответами",
@@ -44,6 +44,6 @@ export class CreateQuestionDto implements IQuestionDto {
 export class CreateAnswerDto implements IAnswerDto {
     @IsNotEmpty()
     @IsString()
-    @ApiProperty({ description: "Заголовок" })
+    @ApiProperty({description: "Заголовок"})
     title: string
 }

@@ -1,8 +1,8 @@
 import {IsArray, IsInt, IsNotEmpty, ValidateNested} from "class-validator"
 import {Type} from "class-transformer"
 import {IAnswerDto, IQuestionDto, ISurveyDto} from "./survey.dto"
-import { ApiProperty } from "@nestjs/swagger"
-import { CreateQuestionDto } from "./create-survey.dto"
+import {ApiProperty} from "@nestjs/swagger"
+import {CreateQuestionDto} from "./create-survey.dto"
 
 export class SaveSurveyResultDto implements ISurveyDto {
     @IsArray()
@@ -19,7 +19,7 @@ export class SaveSurveyResultDto implements ISurveyDto {
 export class SaveQuestionResultDto implements IQuestionDto {
     @IsNotEmpty()
     @IsInt()
-    @ApiProperty({ description: "ID вопроса" })
+    @ApiProperty({description: "ID вопроса"})
     id: number
 
     @IsArray()
@@ -36,6 +36,6 @@ export class SaveQuestionResultDto implements IQuestionDto {
 export class SaveAnswerResultDto implements IAnswerDto {
     @IsNotEmpty()
     @IsInt()
-    @ApiProperty({ description: "ID ответа" })
+    @ApiProperty({description: "ID ответа"})
     id: number
 }

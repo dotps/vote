@@ -6,12 +6,12 @@ import {ApiProperty} from "@nestjs/swagger"
 export class UpdateSurveyDto implements ISurveyDto {
     @IsNotEmpty()
     @IsString()
-    @ApiProperty({ description: "Заголовок опроса" })
+    @ApiProperty({description: "Заголовок опроса"})
     title: string
 
     @IsNotEmpty()
     @IsString()
-    @ApiProperty({ description: "Текст опроса" })
+    @ApiProperty({description: "Текст опроса"})
     description: string
 
     @IsArray()
@@ -28,12 +28,12 @@ export class UpdateSurveyDto implements ISurveyDto {
 export class UpdateQuestionDto implements IQuestionDto {
     @IsOptional()
     @IsInt()
-    @ApiProperty({ description: "ID вопроса" })
+    @ApiProperty({description: "ID вопроса"})
     id: number
 
     @IsNotEmpty()
     @IsString()
-    @ApiProperty({ description: "Заголовок вопроса" })
+    @ApiProperty({description: "Заголовок вопроса"})
     title: string
 
     @IsArray()
@@ -50,17 +50,17 @@ export class UpdateQuestionDto implements IQuestionDto {
 export class UpdateAnswerDto implements IAnswerDto {
     @IsOptional()
     @IsInt()
-    @ApiProperty({ description: "ID ответа" })
+    @ApiProperty({description: "ID ответа"})
     id: number
 
     @IsNotEmpty()
     @IsString()
-    @ApiProperty({ description: "Заголовок ответа" })
+    @ApiProperty({description: "Заголовок ответа"})
     title: string
 }
 
 export class UpdateSurveyStatusDto {
     @IsBoolean()
-    @ApiProperty({ description: "Статус" })
+    @ApiProperty({description: "Статус"})
     status: boolean
 }

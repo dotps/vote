@@ -6,6 +6,7 @@ import {Answer} from "./answer.entity"
 import {Question} from "./question.entity"
 import {DBError} from "../errors/DBError"
 import {UpdateAnswerDto} from "./update-survey.dto"
+import {User} from "../users/user.entity"
 
 @Injectable()
 export class AnswersService {
@@ -18,13 +19,12 @@ export class AnswersService {
     ) {
     }
 
-    async createAnswer(userId: number, surveyId: number, questionId: number, data: CreateAnswerDto, checkUserCanCreateAnswer: boolean = false): Promise<Answer> {
+    async createAnswer(user: User, surveyId: number, questionId: number, data: CreateAnswerDto, checkUserCanCreateAnswer: boolean = false): Promise<Answer> {
 
         if (checkUserCanCreateAnswer) {
             const question = await this.getQuestionWithSurveyHierarchy(questionId)
             if (!question) throw new NotFoundException(`Вопрос id=${questionId} не найден.`)
-                // TODO: >>>>
-            if (question?.survey?.id !== surveyId || question?.survey?.createdBy !== userId) throw new ForbiddenException("У вас нет прав на добавление ответа к этому вопросу.")
+            if (question?.survey?.id !== surveyId || !user.isSelf(question?.survey?.createdBy)) throw new ForbiddenException("У вас нет прав на добавление ответа к этому вопросу.")
         }
 
         const answer = this.createAnswerObjectFromDto(data)
@@ -37,12 +37,11 @@ export class AnswersService {
         }
     }
 
-    async updateAnswer(userId: number, surveyId: number, answerDto: UpdateAnswerDto, isReturnUpdatedData: boolean = true): Promise<Answer | null> {
+    async updateAnswer(user: User, surveyId: number, answerDto: UpdateAnswerDto, isReturnUpdatedData: boolean = true): Promise<Answer | null> {
         const answer = await this.getAnswerWithSurveyHierarchy(answerDto)
 
         if (!answer) throw new NotFoundException(`Ответ id=${answerDto.id} не найден.`)
-        // TODO: вместо userId: number, передать user и заменить на user.isSelf(survey.createdBy), таких мест много
-        if (answer?.question?.survey?.id !== surveyId || answer?.question?.survey?.createdBy !== userId) throw new ForbiddenException("У вас нет прав на обновление этого ответа.")
+        if (answer?.question?.survey?.id !== surveyId || !user.isSelf(answer?.question?.survey?.createdBy)) throw new ForbiddenException("У вас нет прав на обновление этого ответа.")
 
         this.updateAnswerObjectFromDto(answer, answerDto)
         await this.answerRepository.update(answerDto.id, answer)
@@ -81,8 +80,7 @@ export class AnswersService {
         if ("id" in answerDto) {
             const {id, ...answerFields} = answerDto
             Object.assign(answer, answerFields)
-        }
-        else {
+        } else {
             Object.assign(answer, answerDto)
         }
     }
