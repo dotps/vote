@@ -37,7 +37,6 @@ export class AuthController {
     @Get("profile")
     @ApiAuthProfile()
     getProfile(@CurrentUser() user: User): User {
-        // TODO: добавить dto много лишнего отдается
         return user
     }
 }

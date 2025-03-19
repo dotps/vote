@@ -3,19 +3,16 @@ import {InjectRepository} from "@nestjs/typeorm"
 import {Repository} from "typeorm"
 import {Survey} from "./survey.entity"
 import {CreateSurveyDto} from "./create-survey.dto"
-import {SaveSurveyResultDto} from "./save-survey-result.dto"
+import {SaveQuestionResultDto, SaveSurveyResultDto} from "./save-survey-result.dto"
 import {SurveyResult} from "./survey-result.entity"
 import {DBError} from "../errors/DBError"
 import {ISurveyDto} from "./survey.dto"
-import {Question} from "./question.entity"
-import {Answer} from "./answer.entity"
-import {AnswersService} from "./answers.service"
-import {QuestionsService} from "./questions.service"
 import {Errors, ErrorsMessages} from "../errors/errors"
 import {Responses, ResponseUpdateDto} from "../responses/Responses"
-import {UpdateAnswerDto, UpdateQuestionDto, UpdateSurveyDto} from "./update-survey.dto"
+import {UpdateSurveyDto} from "./update-survey.dto"
 import {User} from "../users/user.entity"
 import {SurveyResultResponseDto} from "./survey-result-response.dto"
+import {UpdateSurveysService} from "./update-surveys.service"
 
 @Injectable()
 export class SurveysService {
@@ -25,8 +22,7 @@ export class SurveysService {
         private readonly surveyRepository: Repository<Survey>,
         @InjectRepository(SurveyResult)
         private readonly resultRepository: Repository<SurveyResult>,
-        private answersService: AnswersService,
-        private questionsService: QuestionsService,
+        private updateSurveysService: UpdateSurveysService,
     ) {
     }
 
@@ -58,32 +54,35 @@ export class SurveysService {
     }
 
     async saveUserSurveyResult(user: User, surveyId: number, data: SaveSurveyResultDto): Promise<SurveyResult[]> {
-
         const survey = await this.getSurvey(surveyId, {isExcludeRelations: true, enabled: true})
         if (!survey) throw new NotFoundException(Errors.displayId(surveyId) + ErrorsMessages.SURVEY_NOT_FOUND)
 
         if (data.questions.length === 0) throw new BadRequestException(ErrorsMessages.QUESTIONS_NOT_EMPTY)
 
-        const saveResults: SurveyResult[] = []
-        for (const question of data.questions) {
+        return await this.saveSurveyResult(user.id, surveyId, data.questions)
+    }
+
+    private async saveSurveyResult(userId: number, surveyId: number, questions: SaveQuestionResultDto[]): Promise<SurveyResult[]> {
+        const savedResults: SurveyResult[] = []
+        for (const question of questions) {
             if (question.answers.length === 0) throw new BadRequestException(ErrorsMessages.ANSWERS_NOT_EMPTY)
 
             for (const answer of question.answers) {
                 try {
                     const surveyResult = this.resultRepository.create({
                         surveyId: surveyId,
-                        userId: user.id,
+                        userId: userId,
                         questionId: question.id,
                         answerId: answer.id,
                     })
                     const result = await this.resultRepository.save(surveyResult)
-                    saveResults.push(result)
+                    savedResults.push(result)
                 } catch (error) {
                     DBError.handle(error)
                 }
             }
         }
-        return saveResults
+        return savedResults
     }
 
     async getSurveyResult(id: number): Promise<SurveyResultResponseDto[]> {
@@ -113,64 +112,11 @@ export class SurveysService {
     }
 
     async updateSurvey(surveyDto: UpdateSurveyDto, user: User, surveyId: number): Promise<Survey> {
-
         const survey = await this.getSurvey(surveyId)
         if (!user.isSelf(survey?.createdBy)) throw new ForbiddenException(ErrorsMessages.SURVEY_UPDATE_FORBIDDEN)
 
-        const {questions: questionsDto, ...surveyFields} = surveyDto
-        this.updateSurveyFields(survey, surveyFields)
-        this.updateQuestionsInSurvey(survey.questions, questionsDto)
-
+        this.updateSurveysService.updateSurveyEntity(survey, surveyDto)
         return await this.surveyRepository.save(survey)
-    }
-
-    // TODO: вынести методы ниже в отдельный сервис UpdateSurveyService
-    private updateQuestionsInSurvey(questions: Question[], questionsDto: UpdateQuestionDto[]) {
-        for (const questionDto of questionsDto) {
-            if (questionDto.id) {
-                const question = this.updateQuestion(questions, questionDto)
-                for (const answerDto of questionDto.answers) {
-                    if (answerDto.id) this.updateAnswer(question.answers, answerDto)
-                    else this.createAnswerAndAddToQuestion(answerDto, question)
-                }
-            } else {
-                const question = this.createQuestionFromDtoWithoutAnswers(questionDto)
-                for (const answerDto of questionDto.answers) {
-                    this.createAnswerAndAddToQuestion(answerDto, question)
-                }
-                questions.push(question)
-            }
-        }
-    }
-
-    private updateSurveyFields(survey: Survey, surveyFields: Partial<UpdateSurveyDto>) {
-        Object.assign(survey, surveyFields)
-    }
-
-    private createAnswerAndAddToQuestion(answerDto: UpdateAnswerDto, question: Question) {
-        const answer = this.answersService.createAnswerObjectFromDto(answerDto)
-        question.answers.push(answer)
-    }
-
-    private createQuestionFromDtoWithoutAnswers(questionDto: UpdateQuestionDto): Question {
-        const question = new Question()
-        this.questionsService.updateQuestionObjectFromDto(question, questionDto)
-        question.answers = []
-        return question
-    }
-
-    private updateAnswer(answers: Answer[], answerDto: UpdateAnswerDto): Answer {
-        const answer = answers.find(a => a.id === answerDto.id)
-        if (!answer) throw new NotFoundException(Errors.displayId(answerDto.id) + ErrorsMessages.ANSWER_NOT_FOUND)
-        this.answersService.updateAnswerObjectFromDto(answer, answerDto)
-        return answer
-    }
-
-    private updateQuestion(questions: Question[], questionDto: UpdateQuestionDto): Question {
-        const question = questions.find(q => q.id === questionDto.id)
-        if (!question) throw new NotFoundException(Errors.displayId(questionDto.id) + ErrorsMessages.QUESTION_NOT_FOUND)
-        this.questionsService.updateQuestionObjectFromDto(question, questionDto)
-        return question
     }
 
     async setSurveyActive(user: User, surveyId: number, status: boolean): Promise<ResponseUpdateDto> {
