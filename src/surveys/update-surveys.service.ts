@@ -16,7 +16,7 @@ export class UpdateSurveysService {
     ) {
     }
 
-    updateSurveyEntity(survey: Survey, surveyDto: UpdateSurveyDto) {
+    updateSurvey(survey: Survey, surveyDto: UpdateSurveyDto) {
         const {questions: questionsDto, ...surveyFields} = surveyDto
         this.updateSurveyFields(survey, surveyFields)
         this.updateQuestionsInSurvey(survey.questions, questionsDto)

@@ -53,6 +53,21 @@ export class AnswersService {
         return null
     }
 
+    createAnswerObjectFromDto(answerDto: CreateAnswerDto | UpdateAnswerDto): Answer {
+        const answer = new Answer()
+        this.updateAnswerObjectFromDto(answer, answerDto)
+        return answer
+    }
+
+    updateAnswerObjectFromDto(answer: Answer, answerDto: CreateAnswerDto | UpdateAnswerDto): void {
+        if ("id" in answerDto) {
+            const {id, ...answerFields} = answerDto
+            Object.assign(answer, answerFields)
+        } else {
+            Object.assign(answer, answerDto)
+        }
+    }
+
     private async getAnswerWithSurveyHierarchy(answerDto: UpdateAnswerDto): Promise<Answer> {
         return await this.answerRepository
             .createQueryBuilder("answer")
@@ -68,20 +83,5 @@ export class AnswersService {
             .leftJoinAndSelect("question.survey", "survey")
             .where({id: questionId})
             .getOne()
-    }
-
-    createAnswerObjectFromDto(answerDto: CreateAnswerDto | UpdateAnswerDto): Answer {
-        const answer = new Answer()
-        this.updateAnswerObjectFromDto(answer, answerDto)
-        return answer
-    }
-
-    updateAnswerObjectFromDto(answer: Answer, answerDto: CreateAnswerDto | UpdateAnswerDto): void {
-        if ("id" in answerDto) {
-            const {id, ...answerFields} = answerDto
-            Object.assign(answer, answerFields)
-        } else {
-            Object.assign(answer, answerDto)
-        }
     }
 }

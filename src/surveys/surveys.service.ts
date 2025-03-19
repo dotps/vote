@@ -56,9 +56,7 @@ export class SurveysService {
     async saveUserSurveyResult(user: User, surveyId: number, data: SaveSurveyResultDto): Promise<SurveyResult[]> {
         const survey = await this.getSurvey(surveyId, {isExcludeRelations: true, enabled: true})
         if (!survey) throw new NotFoundException(Errors.displayId(surveyId) + ErrorsMessages.SURVEY_NOT_FOUND)
-
         if (data.questions.length === 0) throw new BadRequestException(ErrorsMessages.QUESTIONS_NOT_EMPTY)
-
         return await this.saveSurveyResult(user.id, surveyId, data.questions)
     }
 
@@ -115,7 +113,7 @@ export class SurveysService {
         const survey = await this.getSurvey(surveyId)
         if (!user.isSelf(survey?.createdBy)) throw new ForbiddenException(ErrorsMessages.SURVEY_UPDATE_FORBIDDEN)
 
-        this.updateSurveysService.updateSurveyEntity(survey, surveyDto)
+        this.updateSurveysService.updateSurvey(survey, surveyDto)
         return await this.surveyRepository.save(survey)
     }
 
