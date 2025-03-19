@@ -23,6 +23,7 @@ export class AnswersService {
         if (checkUserCanCreateAnswer) {
             const question = await this.getQuestionWithSurveyHierarchy(questionId)
             if (!question) throw new NotFoundException(`Вопрос id=${questionId} не найден.`)
+                // TODO: >>>>
             if (question?.survey?.id !== surveyId || question?.survey?.createdBy !== userId) throw new ForbiddenException("У вас нет прав на добавление ответа к этому вопросу.")
         }
 

@@ -8,8 +8,9 @@ import {SurveyResultResponse} from "./surveys/surveys.service"
 import {SaveSurveyResultDto} from "./surveys/save-survey-result.dto"
 import {SurveyResult} from "./surveys/survey-result.entity"
 import {User} from "./users/user.entity"
-import {UpdateAnswerDto, UpdateSurveyDto} from "./surveys/update-survey.dto"
+import {UpdateAnswerDto, UpdateSurveyDto, UpdateSurveyStatusDto} from "./surveys/update-survey.dto"
 import {Answer} from "./surveys/answer.entity"
+import {ResponseUpdateDto} from "./responses/Responses"
 
 export function ApiCreateUser() {
     return applyDecorators(
@@ -160,7 +161,9 @@ export function ApiUpdateAnswer() {
     return applyDecorators(
         ApiOperation({
             summary: "Обновить ответ.",
-            description: "Для обновления ответа, необходимо отправить (имя, email, пароль). Все поля обязательны."
+            description: "Этот маршрут позволяет обновить ответ на вопрос в опросе.\n\n Алиасы:\n" +
+                "- **\\`:surveyId/answers/:answerId\\`** — основной маршрут.\n" +
+                "- **\\`:surveyId/questions/:questionId/answers/:answerId\\`** — алиас. Важен answerId, questionId - не используется."
         }),
         ApiResponse({status: 200, description: "Ответ успешно обновлен.", type: Answer}),
         ApiResponse({status: 400, description: "Неверные данные. Валидация данных по типу и содержимому."}),
@@ -172,15 +175,30 @@ export function ApiUpdateAnswer() {
 }
 
 export function ApiCreateAnswer() {
-    // TODO: продолжить
     return applyDecorators(
         ApiOperation({
-            summary: "Создание нового пользователя.",
-            description: "Для создания пользователя, необходимо отправить (имя, email, пароль), возвращается JWT-токен для дальнейшего доступа к системе."
+            summary: "Создание нового ответа.",
         }),
-        ApiResponse({status: 201, description: "Пользователь успешно создан.", type: AuthDto}),
-        ApiResponse({status: 400, description: "Неверные данные. Валидация данных по типу и содержимому."}),
-        ApiBody({type: UserDto}),
+        ApiResponse({status: 201, description: "Ответ успешно создан.", type: Answer}),
+        ApiResponse({status: 400, description: "Неверные данные. Валидация данных по типу и содержимому. Ошибки работы с БД."}),
+        ApiResponse({status: 403, description: "Пользователь может обновить только свой опрос и связанные с ним данные."}),
+        ApiResponse({status: 404, description: "Вопрос не найден."}),
+        ApiBody({type: CreateAnswerDto}),
     )
 }
+
+export function ApiSetSurveyActive() {
+    return applyDecorators(
+        ApiOperation({
+            summary: "Обновить статус опроса.",
+            description: "Окрыть/закрыть опрос для взаимодействия пользователям в системе."
+        }),
+        ApiResponse({status: 200, description: "Статус обновления.", type: ResponseUpdateDto}),
+        ApiResponse({status: 400, description: "Неверные данные. Валидация данных по типу и содержимому."}),
+        ApiResponse({status: 403, description: "Пользователь может обновить только свой опрос и связанные с ним данные."}),
+        ApiResponse({status: 404, description: "Опрос не найден."}),
+        ApiBody({type: UpdateSurveyStatusDto}),
+    )
+}
+
 

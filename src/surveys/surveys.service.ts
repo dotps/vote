@@ -14,7 +14,7 @@ import {Answer} from "./answer.entity"
 import {AnswersService} from "./answers.service"
 import {QuestionsService} from "./questions.service"
 import {Errors, ErrorsMessages} from "../errors/errors"
-import {ResponseResult, Responses} from "../responses/Responses"
+import {ResponseUpdateDto, Responses} from "../responses/Responses"
 import {UpdateAnswerDto, UpdateQuestionDto, UpdateSurveyDto} from "./update-survey.dto"
 import { ApiProperty } from "@nestjs/swagger"
 
@@ -174,7 +174,7 @@ export class SurveysService {
         return question
     }
 
-    async setSurveyActive(userId: number, surveyId: number, status: boolean): Promise<ResponseResult> {
+    async setSurveyActive(userId: number, surveyId: number, status: boolean): Promise<ResponseUpdateDto> {
         const survey = await this.getSurvey(surveyId, {isExcludeRelations: true})
         // TODO: вместо userId: number, передать user и заменить на user.isSelf(survey.createdBy), таких мест много
         if (survey.createdBy !== userId) throw new ForbiddenException(ErrorsMessages.SURVEY_UPDATE_FORBIDDEN)

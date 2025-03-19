@@ -22,7 +22,7 @@ import {Answer} from "./answer.entity"
 import {AnswersService} from "./answers.service"
 import {CurrentUser} from "../users/current-user.decorator"
 import {User} from "../users/user.entity"
-import {ResponseResult} from "../responses/Responses"
+import {ResponseUpdateDto} from "../responses/Responses"
 import {UpdateAnswerDto, UpdateSurveyDto, UpdateSurveyStatusDto} from "./update-survey.dto"
 import {
     ApiCreateAnswer,
@@ -30,7 +30,7 @@ import {
     ApiGetAllSurveys,
     ApiGetSurvey,
     ApiGetSurveyResult,
-    ApiSaveSurveyResult, ApiUpdateAnswer, ApiUpdateSurvey,
+    ApiSaveSurveyResult, ApiSetSurveyActive, ApiUpdateAnswer, ApiUpdateSurvey,
 } from "../swagger.decorator"
 import {ApiBearerAuth, ApiResponse, ApiTags} from "@nestjs/swagger"
 
@@ -72,7 +72,6 @@ export class SurveysController {
         // TODO: протестировать после замены типа на класс
     }
 
-    // TODO: продолжить описание
     @Post(":id")
     @UsePipes(ValidationPipe)
     @ApiSaveSurveyResult()
@@ -95,7 +94,10 @@ export class SurveysController {
         return await this.surveysService.updateSurvey(data, user.id, id)
     }
 
-    @Patch(":surveyId/answers/:answerId")
+    @Patch([
+        ":surveyId/answers/:answerId",
+        ":surveyId/questions/:questionId/answers/:answerId" // алиас
+    ])
     @UsePipes(ValidationPipe)
     @ApiUpdateAnswer()
     async updateAnswer(
@@ -126,11 +128,12 @@ export class SurveysController {
 
     @Patch(":surveyId/status")
     @UsePipes(ValidationPipe)
+    @ApiSetSurveyActive()
     async setSurveyActive(
         @Param("surveyId", ParseIntPipe) surveyId: number,
         @Body() data: UpdateSurveyStatusDto,
         @CurrentUser() user: User,
-    ): Promise<ResponseResult> {
+    ): Promise<ResponseUpdateDto> {
         return await this.surveysService.setSurveyActive(user.id, surveyId, data.status)
     }
 }
