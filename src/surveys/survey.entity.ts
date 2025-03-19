@@ -2,7 +2,6 @@ import {Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, Upd
 import {Question} from "./question.entity"
 import {SurveyResult} from "./survey-result.entity"
 import {ApiProperty} from "@nestjs/swagger"
-import {CreateQuestionDto} from "./create-survey.dto"
 
 @Entity()
 export class Survey {

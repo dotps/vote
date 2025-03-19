@@ -2,9 +2,7 @@ import {BadRequestException, ForbiddenException, Injectable, NotFoundException} 
 import {InjectRepository} from "@nestjs/typeorm"
 import {Repository} from "typeorm"
 import {Survey} from "./survey.entity"
-import {
-    CreateSurveyDto
-} from "./create-survey.dto"
+import {CreateSurveyDto} from "./create-survey.dto"
 import {SaveSurveyResultDto} from "./save-survey-result.dto"
 import {SurveyResult} from "./survey-result.entity"
 import {DBError} from "../errors/DBError"
@@ -14,10 +12,10 @@ import {Answer} from "./answer.entity"
 import {AnswersService} from "./answers.service"
 import {QuestionsService} from "./questions.service"
 import {Errors, ErrorsMessages} from "../errors/errors"
-import {ResponseUpdateDto, Responses} from "../responses/Responses"
+import {Responses, ResponseUpdateDto} from "../responses/Responses"
 import {UpdateAnswerDto, UpdateQuestionDto, UpdateSurveyDto} from "./update-survey.dto"
-import {ApiProperty} from "@nestjs/swagger"
 import {User} from "../users/user.entity"
+import {SurveyResultResponseDto} from "./survey-result-response.dto"
 
 @Injectable()
 export class SurveysService {
@@ -88,7 +86,7 @@ export class SurveysService {
         return saveResults
     }
 
-    async getSurveyResult(id: number): Promise<SurveyResultResponse[]> {
+    async getSurveyResult(id: number): Promise<SurveyResultResponseDto[]> {
         const results = await this.resultRepository
             .createQueryBuilder("result")
             .select("survey.title", "surveyTitle")
@@ -107,7 +105,7 @@ export class SurveysService {
             .getRawMany()
 
         if (!results || results.length === 0) throw new NotFoundException(ErrorsMessages.SURVEY_RESULTS_NOT_FOUND)
-        return results as SurveyResultResponse[]
+        return results as SurveyResultResponseDto[]
     }
 
     private addCreatedByUser(data: ISurveyDto, userId: number) {
@@ -196,32 +194,4 @@ export type GetSurveyOptions = {
 const defaultGetSurveyOptions: GetSurveyOptions = {
     isExcludeRelations: false,
     enabled: undefined,
-}
-
-/*
-export type SurveyResultResponse = {
-    surveyId: number,
-    surveyTitle: string,
-    questionId: number,
-    questionTitle: string,
-    answerId: number,
-    answerTitle: string,
-    answerCount: number
-}*/
-
-export class SurveyResultResponse {
-    @ApiProperty({description: "ID опроса"})
-    surveyId: number
-    @ApiProperty({description: "Заголовок опроса"})
-    surveyTitle: string
-    @ApiProperty({description: "ID вопроса"})
-    questionId: number
-    @ApiProperty({description: "Заголовок вопроса"})
-    questionTitle: string
-    @ApiProperty({description: "ID ответа"})
-    answerId: number
-    @ApiProperty({description: "Заголовок ответа"})
-    answerTitle: string
-    @ApiProperty({description: "Сколько раз был выбран данный ответ"})
-    answerCount: number
 }

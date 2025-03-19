@@ -4,7 +4,6 @@ import {Reflector} from "@nestjs/core"
 import {IS_PUBLIC_KEY} from "./public.decorator"
 import {TokenService} from "./token.service"
 import {UserService} from "../users/user.service"
-import {User} from "../users/user.entity"
 import {ErrorsMessages} from "../errors/errors"
 
 @Injectable()

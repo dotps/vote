@@ -1,16 +1,16 @@
 import {applyDecorators} from "@nestjs/common"
-import {ApiOperation, ApiResponse, ApiBody, ApiParam, getSchemaPath} from "@nestjs/swagger"
+import {ApiOperation, ApiResponse, ApiBody, ApiParam} from "@nestjs/swagger"
 import {UserDto} from "./users/user.dto"
 import {AuthDto} from "./auth/auth.dto"
 import {CreateAnswerDto, CreateSurveyDto} from "./surveys/create-survey.dto"
 import {Survey} from "./surveys/survey.entity"
-import {SurveyResultResponse} from "./surveys/surveys.service"
 import {SaveSurveyResultDto} from "./surveys/save-survey-result.dto"
 import {SurveyResult} from "./surveys/survey-result.entity"
 import {User} from "./users/user.entity"
-import {UpdateAnswerDto, UpdateSurveyDto, UpdateSurveyStatusDto} from "./surveys/update-survey.dto"
+import {UpdateSurveyDto, UpdateSurveyStatusDto} from "./surveys/update-survey.dto"
 import {Answer} from "./surveys/answer.entity"
 import {ResponseUpdateDto} from "./responses/Responses"
+import {SurveyResultResponseDto} from "./surveys/survey-result-response.dto"
 
 export function ApiCreateUser() {
     return applyDecorators(
@@ -112,7 +112,7 @@ export function ApiGetSurveyResult() {
             status: 200,
             description: "Результат опроса с вопросами, ответами и сколько раз были даны ответы.",
             isArray: true,
-            type: SurveyResultResponse
+            type: SurveyResultResponseDto
         }),
         ApiResponse({status: 404, description: "Результаты опроса не найдены."}),
     )

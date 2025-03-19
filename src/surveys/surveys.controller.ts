@@ -10,7 +10,7 @@ import {
     UsePipes,
     ValidationPipe,
 } from "@nestjs/common"
-import {SurveyResultResponse, SurveysService} from "./surveys.service"
+import {SurveysService} from "./surveys.service"
 import {Survey} from "./survey.entity"
 import {SaveSurveyResultDto} from "./save-survey-result.dto"
 import {
@@ -33,6 +33,7 @@ import {
     ApiSaveSurveyResult, ApiSetSurveyActive, ApiUpdateAnswer, ApiUpdateSurvey,
 } from "../swagger.decorator"
 import {ApiBearerAuth, ApiResponse, ApiTags} from "@nestjs/swagger"
+import {SurveyResultResponseDto} from "./survey-result-response.dto"
 
 @Controller("surveys")
 @ApiTags("surveys")
@@ -67,9 +68,8 @@ export class SurveysController {
 
     @Get(":id/result")
     @ApiGetSurveyResult()
-    async getSurveyResult(@Param("id", ParseIntPipe) id: number): Promise<SurveyResultResponse[]> {
+    async getSurveyResult(@Param("id", ParseIntPipe) id: number): Promise<SurveyResultResponseDto[]> {
         return await this.surveysService.getSurveyResult(id)
-        // TODO: протестировать после замены типа на класс
     }
 
     @Post(":id")

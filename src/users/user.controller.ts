@@ -18,7 +18,7 @@ import {ValidationGroup} from "../validation/ValidationGroup"
 import {AuthDto} from "../auth/auth.dto"
 import {CurrentUser} from "./current-user.decorator"
 import {ErrorsMessages} from "../errors/errors"
-import {ApiBody, ApiOperation, ApiResponse, ApiTags} from "@nestjs/swagger"
+import {ApiTags} from "@nestjs/swagger"
 import {ApiCreateUser, ApiPartialUpdateUser, ApiUpdateUser} from "../swagger.decorator"
 
 @Controller("users")

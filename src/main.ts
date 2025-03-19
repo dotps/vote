@@ -19,27 +19,9 @@ async function bootstrap() {
         .setTitle("Survey API")
         .setDescription("Описание API")
         .setVersion("1.0")
-        // .addBearerAuth()
         .build()
 
     const document = SwaggerModule.createDocument(app, configSwagger)
-    // document.components.responses = {
-    //   Unauthorized: {
-    //     description: "Unauthorized",
-    //     content: {
-    //       "application/json": {
-    //         schema: {
-    //           type: "object",
-    //           properties: {
-    //             statusCode: { type: "number", example: 401 },
-    //             message: { type: "string", example: "Unauthorized" },
-    //           },
-    //         },
-    //       },
-    //     },
-    //   },
-    // }
-
     SwaggerModule.setup("api", app, document)
 
     await app.listen(port)

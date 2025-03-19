@@ -2,7 +2,6 @@ import {IsArray, IsInt, IsNotEmpty, ValidateNested} from "class-validator"
 import {Type} from "class-transformer"
 import {IAnswerDto, IQuestionDto, ISurveyDto} from "./survey.dto"
 import {ApiProperty} from "@nestjs/swagger"
-import {CreateQuestionDto} from "./create-survey.dto"
 
 export class SaveSurveyResultDto implements ISurveyDto {
     @IsArray()

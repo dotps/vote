@@ -7,17 +7,14 @@ import {
     UsePipes,
     ValidationPipe,
     Get,
-    UseGuards,
-    Request
 } from "@nestjs/common"
 import {AuthService} from "./auth.service"
 import {UserDto} from "../users/user.dto"
-import {AuthGuard} from "./auth.guard"
 import {Public} from "./public.decorator"
 import {ValidationGroup} from "../validation/ValidationGroup"
 import {CurrentUser} from "../users/current-user.decorator"
 import {User} from "../users/user.entity"
-import {ApiResponse, ApiTags} from "@nestjs/swagger"
+import {ApiTags} from "@nestjs/swagger"
 import {ApiAuthLogin, ApiAuthProfile} from "../swagger.decorator"
 import {AuthDto} from "./auth.dto"
 
