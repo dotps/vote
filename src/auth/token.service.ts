@@ -14,8 +14,8 @@ export class TokenService {
     }
 
     async generateToken(user: User): Promise<string> {
-        const payload = { sub: user.id, username: user.name }
-        const token =  await this.jwtService.signAsync(payload)
+        const payload = {sub: user.id, username: user.name}
+        const token = await this.jwtService.signAsync(payload)
         if (!token) throw new UnauthorizedException(ErrorsMessages.AUTH_TOKEN_NOT_FOUND)
         return token
     }

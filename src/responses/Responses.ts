@@ -9,13 +9,13 @@ enum UpdateStatus {
 export class Responses {
 
     static update(result: UpdateResult): Promise<ResponseUpdateDto> {
-        const response: ResponseUpdateDto = result?.affected ? { status: UpdateStatus.Success } : { status: UpdateStatus.Unaffected }
+        const response: ResponseUpdateDto = result?.affected ? {status: UpdateStatus.Success} : {status: UpdateStatus.Unaffected}
         return Promise.resolve(response)
     }
 
 }
 
 export class ResponseUpdateDto {
-    @ApiProperty({ description: "Статус", example: UpdateStatus.Success, enum: UpdateStatus })
+    @ApiProperty({description: "Статус", example: UpdateStatus.Success, enum: UpdateStatus})
     status: string
 }

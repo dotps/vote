@@ -72,7 +72,7 @@ export function ApiUpdateSurvey() {
             summary: "Обновить данные опроса.",
             description: "Обновляет только то, что передано. Непереданные вопросы и ответы не удаляются."
         }),
-        ApiResponse({status: 200, description: "Опрос успешно обновлен.", type:  Survey}),
+        ApiResponse({status: 200, description: "Опрос успешно обновлен.", type: Survey}),
         ApiResponse({status: 400, description: "Неверные данные. Валидация данных по типу и содержимому."}),
         ApiResponse({status: 401, description: "Требуется авторизация."}),
         ApiResponse({status: 403, description: "Пользователь может обновить только свой опрос."}),
@@ -168,7 +168,10 @@ export function ApiUpdateAnswer() {
         ApiResponse({status: 200, description: "Ответ успешно обновлен.", type: Answer}),
         ApiResponse({status: 400, description: "Неверные данные. Валидация данных по типу и содержимому."}),
         ApiResponse({status: 401, description: "Требуется авторизация."}),
-        ApiResponse({status: 403, description: "Пользователь может обновить только свой опрос и связанные с ним данные."}),
+        ApiResponse({
+            status: 403,
+            description: "Пользователь может обновить только свой опрос и связанные с ним данные."
+        }),
         ApiResponse({status: 404, description: "Ответ не найден."}),
         ApiBody({type: CreateAnswerDto}),
     )
@@ -180,8 +183,14 @@ export function ApiCreateAnswer() {
             summary: "Создание нового ответа.",
         }),
         ApiResponse({status: 201, description: "Ответ успешно создан.", type: Answer}),
-        ApiResponse({status: 400, description: "Неверные данные. Валидация данных по типу и содержимому. Ошибки работы с БД."}),
-        ApiResponse({status: 403, description: "Пользователь может обновить только свой опрос и связанные с ним данные."}),
+        ApiResponse({
+            status: 400,
+            description: "Неверные данные. Валидация данных по типу и содержимому. Ошибки работы с БД."
+        }),
+        ApiResponse({
+            status: 403,
+            description: "Пользователь может обновить только свой опрос и связанные с ним данные."
+        }),
         ApiResponse({status: 404, description: "Вопрос не найден."}),
         ApiBody({type: CreateAnswerDto}),
     )
@@ -195,7 +204,10 @@ export function ApiSetSurveyActive() {
         }),
         ApiResponse({status: 200, description: "Статус обновления.", type: ResponseUpdateDto}),
         ApiResponse({status: 400, description: "Неверные данные. Валидация данных по типу и содержимому."}),
-        ApiResponse({status: 403, description: "Пользователь может обновить только свой опрос и связанные с ним данные."}),
+        ApiResponse({
+            status: 403,
+            description: "Пользователь может обновить только свой опрос и связанные с ним данные."
+        }),
         ApiResponse({status: 404, description: "Опрос не найден."}),
         ApiBody({type: UpdateSurveyStatusDto}),
     )
