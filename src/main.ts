@@ -17,12 +17,12 @@ async function bootstrap() {
 
     const configSwagger = new DocumentBuilder()
         .setTitle("Survey API")
-        .setDescription("Описание API")
+        .setDescription("Для работы на платформе необходимо зарегистрироваться `POST` `/users` и получить *Bearer Token* для авторизации.")
         .setVersion("1.0")
         .build()
 
     const document = SwaggerModule.createDocument(app, configSwagger)
-    SwaggerModule.setup("api", app, document)
+    SwaggerModule.setup("docs", app, document)
 
     await app.listen(port)
 }
