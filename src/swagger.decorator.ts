@@ -143,7 +143,8 @@ export function ApiAuthLogin() {
             description: "Для авторизации необходимо отправить (имя, пароль)."
         }),
         ApiResponse({status: 200, description: "Пользователь успешно авторизован.", type: AuthDto}),
-        ApiResponse({status: 401, description: "Неверные данные."}),
+        ApiResponse({status: 400, description: "Неверные данные. Валидация данных по типу и содержимому."}),
+        ApiResponse({status: 401, description: "Неверные данные для авторизации."}),
         ApiResponse({status: 404, description: "Пользователь не найден."}),
         ApiBody({type: UserDto}),
     )

@@ -28,3 +28,6 @@ async function bootstrap() {
 }
 
 bootstrap()
+
+// TODO: в swagger неправильно отображается POST /surveys Request body >>>> answers почему-то не массив объектов
+// TODO: подготовить postman коллекцию
