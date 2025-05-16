@@ -36,6 +36,7 @@ export class CreateQuestionDto implements IQuestionDto {
     @Type(() => CreateAnswerDto)
     @ApiProperty({
         description: "Массив объектов с ответами",
+        isArray: true,
         type: () => CreateAnswerDto,
     })
     answers: CreateAnswerDto[]
