@@ -96,7 +96,7 @@ export class SurveysController {
 
     @Patch([
         ":surveyId/answers/:answerId",
-        ":surveyId/questions/:questionId/answers/:answerId" // алиас
+        // ":surveyId/questions/:questionId/answers/:answerId" // алиас
     ])
     @UsePipes(ValidationPipe)
     @ApiUpdateAnswer()
@@ -134,6 +134,6 @@ export class SurveysController {
         @Body() data: UpdateSurveyStatusDto,
         @CurrentUser() user: User,
     ): Promise<ResponseUpdateDto> {
-        return await this.surveysService.setSurveyActive(user, surveyId, data.status)
+        return await this.surveysService.setSurveyActive(user, surveyId, data.enabled)
     }
 }

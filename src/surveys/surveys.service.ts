@@ -117,12 +117,12 @@ export class SurveysService {
         return await this.surveyRepository.save(survey)
     }
 
-    async setSurveyActive(user: User, surveyId: number, status: boolean): Promise<ResponseUpdateDto> {
+    async setSurveyActive(user: User, surveyId: number, enabled: boolean): Promise<ResponseUpdateDto> {
         const survey = await this.getSurvey(surveyId, {isExcludeRelations: true})
         if (!user.isSelf(survey?.createdBy)) throw new ForbiddenException(ErrorsMessages.SURVEY_UPDATE_FORBIDDEN)
 
         const surveyForUpdate = this.surveyRepository.create({
-            enabled: status,
+            enabled: enabled,
         })
 
         const result = await this.surveyRepository.update(surveyId, surveyForUpdate)

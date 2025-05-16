@@ -62,5 +62,5 @@ export class UpdateAnswerDto implements IAnswerDto {
 export class UpdateSurveyStatusDto {
     @IsBoolean()
     @ApiProperty({description: "Статус"})
-    status: boolean
+    enabled: boolean
 }

@@ -1,4 +1,4 @@
-import {IsArray, IsNotEmpty, IsString, ValidateNested} from "class-validator"
+import {ArrayMinSize, IsArray, IsNotEmpty, IsString, ValidateNested} from "class-validator"
 import {Type} from "class-transformer"
 import {IAnswerDto, IQuestionDto, ISurveyDto} from "./survey.dto"
 import {ApiProperty} from "@nestjs/swagger"
@@ -15,6 +15,7 @@ export class CreateSurveyDto implements ISurveyDto {
     description: string
 
     @IsArray()
+    @ArrayMinSize(1)
     @ValidateNested({each: true})
     @Type(() => CreateQuestionDto)
     @ApiProperty({
@@ -32,6 +33,7 @@ export class CreateQuestionDto implements IQuestionDto {
     title: string
 
     @IsArray()
+    @ArrayMinSize(1)
     @ValidateNested({each: true})
     @Type(() => CreateAnswerDto)
     @ApiProperty({
