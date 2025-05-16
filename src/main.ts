@@ -28,5 +28,3 @@ async function bootstrap() {
 }
 
 bootstrap()
-
-// TODO: подготовить postman коллекцию

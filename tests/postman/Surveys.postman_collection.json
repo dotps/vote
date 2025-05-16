@@ -1,0 +1,432 @@
+{
+	"info": {
+		"_postman_id": "87dfc496-a719-4f14-8a8e-7d1dac195eab",
+		"name": "Surveys",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30363017"
+	},
+	"item": [
+		{
+			"name": "1. Регистрация пользователя Copy",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Test\",\r\n  \"email\": \"test@test.ru\",\r\n  \"password\": \"password\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/users",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. Авторизация пользователя",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Test\",\r\n  \"password\": \"password\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. Создание опроса",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiVGVzdCIsImlhdCI6MTc0NzM4MDc2NSwiZXhwIjoxNzczMzAwNzY1fQ.RKLqcNOiWNp5q7d-RAVbyd4R-zJWj5G79ZZklD9byj8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"title\": \"Название опроса\",\r\n  \"description\": \"Описание опроса\",\r\n  \"questions\": [\r\n    {\r\n      \"title\": \"Текст вопроса\",\r\n      \"answers\": [\r\n        {\"title\": \"Ответ 1\"},\r\n        {\"title\": \"Ответ 2\"}\r\n      ]\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/surveys",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"surveys"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. Просмотр списка опросов",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/surveys",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"surveys"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5. Получить опрос",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE4LCJ1c2VybmFtZSI6IlRlc3QiLCJpYXQiOjE3NDczMTg3NzQsImV4cCI6MTc0OTkxMDc3NH0.fEJ8jYMGaaY8Hh-SBt3eyZ80hPx7NqF1M-yeZyVmbaQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"title\": \"Название опроса\",\r\n  \"description\": \"Описание опроса\",\r\n  \"questions\": [\r\n    {\r\n      \"title\": \"Текст вопроса\",\r\n      \"answers\": [\r\n        {\"title\": \"Ответ 1\"},\r\n        {\"title\": \"Ответ 2\"}\r\n      ]\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/surveys/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"surveys",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6. Сохранить ответы пользователя в опросе",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiVGVzdCIsImlhdCI6MTc0NzM4MDc2NSwiZXhwIjoxNzczMzAwNzY1fQ.RKLqcNOiWNp5q7d-RAVbyd4R-zJWj5G79ZZklD9byj8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"questions\": [\r\n    {\r\n      \"id\": 0,\r\n      \"answers\": [\r\n        {\r\n          \"id\": 0\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/surveys/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"surveys",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "7. Получить результаты опроса",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiVGVzdCIsImlhdCI6MTc0NzM4MDc2NSwiZXhwIjoxNzczMzAwNzY1fQ.RKLqcNOiWNp5q7d-RAVbyd4R-zJWj5G79ZZklD9byj8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"questions\": [\r\n    {\r\n      \"id\": 0,\r\n      \"answers\": [\r\n        {\r\n          \"id\": 0\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/surveys/1/result",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"surveys",
+						"1",
+						"result"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "8. Обновить опрос",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiVGVzdCIsImlhdCI6MTc0NzM4MDc2NSwiZXhwIjoxNzczMzAwNzY1fQ.RKLqcNOiWNp5q7d-RAVbyd4R-zJWj5G79ZZklD9byj8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"Название опроса - обновление\",\r\n    \"description\": \"Описание опроса - обновление\",\r\n    \"questions\": [\r\n        {\r\n            \"id\": 1,\r\n            \"title\": \"Текст вопроса - обновление\",\r\n            \"answers\": [\r\n                {\r\n                    \"id\": 1,\r\n                    \"title\": \"Ответ 1 - обновление\",\r\n                },\r\n                {\r\n                    \"id\": 2,\r\n                    \"title\": \"Ответ 2 - обновление\",\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/surveys/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"surveys",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "9. Обновить ответ в опросе",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiVGVzdCIsImlhdCI6MTc0NzM4MDc2NSwiZXhwIjoxNzczMzAwNzY1fQ.RKLqcNOiWNp5q7d-RAVbyd4R-zJWj5G79ZZklD9byj8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"Точечное обновление ответа\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/surveys/1/answers/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"surveys",
+						"1",
+						"answers",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "10. Добавление ответа к вопросу",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiVGVzdCIsImlhdCI6MTc0NzM4MDc2NSwiZXhwIjoxNzczMzAwNzY1fQ.RKLqcNOiWNp5q7d-RAVbyd4R-zJWj5G79ZZklD9byj8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"Добавление ответа к вопросу\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/surveys/1/questions/1/answers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"surveys",
+						"1",
+						"questions",
+						"1",
+						"answers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "11. Изменить статус опроса",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoiVGVzdCIsImlhdCI6MTc0NzM4MDc2NSwiZXhwIjoxNzczMzAwNzY1fQ.RKLqcNOiWNp5q7d-RAVbyd4R-zJWj5G79ZZklD9byj8",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"enabled\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/surveys/1/status",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"surveys",
+						"1",
+						"status"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
