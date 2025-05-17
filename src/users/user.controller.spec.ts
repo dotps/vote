@@ -114,52 +114,151 @@ describe("UserController: ", () => {
     })
   })
 
-  /*
-  describe("обновление пользователя (полная перезапись всех свойств)", () => {
-      it("обновить данные пользователя", async () => {
-          userService.updateUser.mockResolvedValue(mockCurrentUser)
+  describe("обновление пользователя (полная перезапись всех свойств): ", () => {
+    it("обновить данные пользователя", async () => {
+      userService.updateUser.mockResolvedValue(mockCurrentUser)
+      const result = await controller.update(currentUserId, mockUserDto, mockCurrentUser)
+      expect(userService.updateUser).toHaveBeenCalledWith(currentUserId, mockUserDto)
+      expect(result).toEqual(mockCurrentUser)
+      console.log("Ответ", result)
+    })
 
-          const result = await controller.update(currentUserId, mockUserDto, mockCurrentUser)
+    it("ошибка при попытке обновить чужой профиль", async () => {
+      const otherUser = createMockUser(otherUserId)
+      try {
+        await controller.update(currentUserId, mockUserDto, otherUser)
+      } catch (error) {
+        console.log("Ошибка доступа:", error.message)
+        expect(error).toBeInstanceOf(ForbiddenException)
+        return
+      }
+      fail("Ожидалось исключение ForbiddenException")
+    })
 
-          expect(userService.updateUser).toHaveBeenCalledWith(currentUserId, mockUserDto)
-          expect(result).toEqual(mockCurrentUser)
+    describe("валидация данных", () => {
+      it("ошибка валидации при пустом email", async () => {
+        const invalidUserDto = { ...mockUserDto, email: "" }
+        await expect(validationPipe.transform(invalidUserDto, { type: "body", metatype: UserDto }))
+          .rejects
+          .toThrow(BadRequestException)
       })
 
-      it("ошибка при попытке обновить чужой профиль", async () => {
-          const otherUser = createMockUser(otherUserId)
-
-          await expect(controller.update(currentUserId, mockUserDto, otherUser))
-              .rejects
-              .toThrow(ForbiddenException)
+      it("ошибка валидации при некорректном email", async () => {
+        const invalidUserDto = { ...mockUserDto, email: "email" }
+        await expect(validationPipe.transform(invalidUserDto, { type: "body", metatype: UserDto }))
+          .rejects
+          .toThrow(BadRequestException)
       })
+
+      it("ошибка валидации при пустом имени", async () => {
+        const invalidUserDto = { ...mockUserDto, name: "" }
+        await expect(validationPipe.transform(invalidUserDto, { type: "body", metatype: UserDto }))
+          .rejects
+          .toThrow(BadRequestException)
+      })
+
+      it("ошибка валидации при пустом пароле", async () => {
+        const invalidUserDto = { ...mockUserDto, password: "" }
+        await expect(validationPipe.transform(invalidUserDto, { type: "body", metatype: UserDto }))
+          .rejects
+          .toThrow(BadRequestException)
+      })
+
+      it("ошибка валидации пароль число", async () => {
+        const invalidUserDto = { ...mockUserDto, password: 11 }
+        await expect(validationPipe.transform(invalidUserDto, { type: "body", metatype: UserDto }))
+          .rejects
+          .toThrow(BadRequestException)
+      })
+    })
   })
 
-  describe("обновление пользователя (обновление только переданных свойств)", () => {
-      it("пользователь обновляет свой профиль", async () => {
-          const partialUpdateDto: Partial<UserDto> = {
-              name: "Updated Name"
-          }
-          const updatedUser = {
-              ...createMockUser(currentUserId),
-              name: "Updated Name"
-          } as User
-          userService.updateUser.mockResolvedValue(updatedUser)
+  describe("обновление пользователя (обновление только переданных свойств): ", () => {
+    it("пользователь обновляет свой профиль", async () => {
+      const partialUpdateDto: Partial<UserDto> = {
+        name: "Updated Name",
+      }
+      const updatedUser = {
+        ...createMockUser(currentUserId),
+        name: "Updated Name",
+      } as User
+      userService.updateUser.mockResolvedValue(updatedUser)
 
-          const result = await controller.partialUpdate(currentUserId, partialUpdateDto as UserDto, mockCurrentUser)
+      const result = await controller.partialUpdate(currentUserId, partialUpdateDto as UserDto, mockCurrentUser)
 
-          expect(userService.updateUser).toHaveBeenCalledWith(currentUserId, partialUpdateDto)
-          expect(result).toEqual(updatedUser)
+      expect(userService.updateUser).toHaveBeenCalledWith(currentUserId, partialUpdateDto)
+      expect(result).toEqual(updatedUser)
+      console.log("Ответ", result)
+    })
+
+    it("при отсутствии email обновляется", async () => {
+      const partialUpdateDto: Partial<UserDto> = {
+        name: "Updated Name",
+        email: undefined
+      }
+      const updatedUser = {
+        ...createMockUser(currentUserId),
+        name: "Updated Name"
+      } as User
+      userService.updateUser.mockResolvedValue(updatedUser)
+
+      const result = await controller.partialUpdate(currentUserId, partialUpdateDto as UserDto, mockCurrentUser)
+
+      expect(userService.updateUser).toHaveBeenCalledWith(currentUserId, partialUpdateDto)
+      expect(result).toEqual(updatedUser)
+      console.log("Ответ при обновлении без email:", result)
+    })
+
+    it("ошибка при попытке частично обновить чужой профиль", async () => {
+      const otherUser = createMockUser(otherUserId)
+      const partialUpdateDto: Partial<UserDto> = {
+        name: "Updated Name",
+      }
+      try {
+        await controller.partialUpdate(currentUserId, partialUpdateDto as UserDto, otherUser)
+      } catch (error) {
+        console.log("Ошибка доступа:", error.message)
+        expect(error).toBeInstanceOf(ForbiddenException)
+        return
+      }
+      fail("Ожидалось исключение ForbiddenException")
+    })
+
+    describe("валидация данных", () => {
+      it("ошибка валидации при пустом email", async () => {
+        const invalidUserDto = { ...mockUserDto, email: "" }
+        await expect(validationPipe.transform(invalidUserDto, { type: "body", metatype: UserDto }))
+          .rejects
+          .toThrow(BadRequestException)
       })
 
-      it("ошибка при попытке частично обновить чужой профиль", async () => {
-          const otherUser = createMockUser(otherUserId)
-          const partialUpdateDto: Partial<UserDto> = {
-              name: "Updated Name"
-          }
-
-          await expect(controller.partialUpdate(currentUserId, partialUpdateDto as UserDto, otherUser))
-              .rejects
-              .toThrow(ForbiddenException)
+      it("ошибка валидации при некорректном email", async () => {
+        const invalidUserDto = { ...mockUserDto, email: "email" }
+        await expect(validationPipe.transform(invalidUserDto, { type: "body", metatype: UserDto }))
+          .rejects
+          .toThrow(BadRequestException)
       })
-  })*/
+
+      it("ошибка валидации при пустом имени", async () => {
+        const invalidUserDto = { ...mockUserDto, name: "" }
+        await expect(validationPipe.transform(invalidUserDto, { type: "body", metatype: UserDto }))
+          .rejects
+          .toThrow(BadRequestException)
+      })
+
+      it("ошибка валидации при пустом пароле", async () => {
+        const invalidUserDto = { ...mockUserDto, password: "" }
+        await expect(validationPipe.transform(invalidUserDto, { type: "body", metatype: UserDto }))
+          .rejects
+          .toThrow(BadRequestException)
+      })
+
+      it("ошибка валидации пароль число", async () => {
+        const invalidUserDto = { ...mockUserDto, password: 11 }
+        await expect(validationPipe.transform(invalidUserDto, { type: "body", metatype: UserDto }))
+          .rejects
+          .toThrow(BadRequestException)
+      })
+    })
+  })
 })
