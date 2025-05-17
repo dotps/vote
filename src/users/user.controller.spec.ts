@@ -5,8 +5,6 @@ import { User } from "./user.entity"
 import { UserDto } from "./user.dto"
 import { AuthDto } from "../auth/auth.dto"
 import { ForbiddenException, ValidationPipe, BadRequestException } from "@nestjs/common"
-import { ValidationGroup } from "../validation/ValidationGroup"
-import { APP_PIPE } from "@nestjs/core"
 
 describe("UserController: ", () => {
   let controller: UserController
