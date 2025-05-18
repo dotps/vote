@@ -1,4 +1,4 @@
-import {IsArray, IsInt, IsNotEmpty, ValidateNested} from "class-validator"
+import {IsArray, IsInt, IsNotEmpty, ValidateNested, ArrayMinSize} from "class-validator"
 import {Type} from "class-transformer"
 import {IAnswerDto, IQuestionDto, ISurveyDto} from "./survey.dto"
 import {ApiProperty} from "@nestjs/swagger"
@@ -22,6 +22,7 @@ export class SaveQuestionResultDto implements IQuestionDto {
     id: number
 
     @IsArray()
+    @ArrayMinSize(1) // TODO: неиросеть при тестах добавила проверить на что влияет
     @ValidateNested({each: true})
     @Type(() => SaveAnswerResultDto)
     @ApiProperty({

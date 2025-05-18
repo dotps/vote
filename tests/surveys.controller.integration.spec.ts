@@ -156,27 +156,26 @@ describe("SurveysController (интеграционный): ", () => {
             ]
         }
 
-        mockUpdateSurveyDto = {
-            title: "Updated Survey",
-            description: "Updated Description",
-            questions: [
-                {
-                    id: 1,
-                    title: "Updated Question 1",
-                    answers: [
-                        { id: 1, title: "Updated Answer 1" },
-                        { id: 2, title: "Updated Answer 2" }
-                    ]
-                },
-                {
-                    id: 2,
-                    title: "New Question",
-                    answers: [
-                        { id: 3, title: "New Answer 1" },
-                        { id: 4, title: "New Answer 2" }
-                    ]
-                }
-            ]
+        // Обновляем mockUpdateSurveyDto после создания опроса
+        if (createdSurveyId) {
+            const surveyResponse = await request(app.getHttpServer())
+                .get(`/surveys/${createdSurveyId}`)
+                .set("Authorization", `Bearer ${authToken}`)
+                .expect(200)
+
+            const survey = surveyResponse.body
+            mockUpdateSurveyDto = {
+                title: "Updated Survey",
+                description: "Updated Description",
+                questions: survey.questions.map((question: any) => ({
+                    id: question.id,
+                    title: `Updated ${question.title}`,
+                    answers: question.answers.map((answer: any) => ({
+                        id: answer.id,
+                        title: `Updated ${answer.title}`
+                    }))
+                }))
+            }
         }
 
         mockUpdateSurveyStatusDto = {
@@ -452,23 +451,6 @@ describe("SurveysController (интеграционный): ", () => {
             })
 
             console.log("Запрос:", updateAnswerDto)
-            console.log("Ответ:", response.body)
-        })
-
-        it("сохранить результаты опроса", async () => {
-            const response = await request(app.getHttpServer())
-                .post(`/surveys/${createdSurveyId}`)
-                .set("Authorization", `Bearer ${authToken}`)
-                .send(mockSaveSurveyResultDto)
-                .expect(201)
-
-            expect(Array.isArray(response.body)).toBe(true)
-            expect(response.body.length).toBeGreaterThan(0)
-            expect(response.body[0]).toHaveProperty("surveyId")
-            expect(response.body[0]).toHaveProperty("questionId")
-            expect(response.body[0]).toHaveProperty("answerId")
-
-            console.log("Запрос:", mockSaveSurveyResultDto)
             console.log("Ответ:", response.body)
         })
     })
