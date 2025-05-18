@@ -1,9 +1,9 @@
 import { Test, TestingModule } from "@nestjs/testing"
-import { UserController } from "./user.controller"
-import { UserService } from "./user.service"
-import { User } from "./user.entity"
-import { UserDto } from "./user.dto"
-import { AuthDto } from "../auth/auth.dto"
+import { UserController } from "../src/users/user.controller"
+import { UserService } from "../src/users/user.service"
+import { User } from "../src/users/user.entity"
+import { UserDto } from "../src/users/user.dto"
+import { AuthDto } from "../src/auth/auth.dto"
 import { ForbiddenException, ValidationPipe, BadRequestException } from "@nestjs/common"
 
 describe("UserController: ", () => {
