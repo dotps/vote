@@ -12,7 +12,7 @@ export const databaseProvider = TypeOrmModule.forRootAsync({
         type: "postgres",
         url: configService.get<string>(Config.DATABASE_URL),
         entities: [User, Survey, Question, Answer, SurveyResult],
-        synchronize: false,
+        synchronize: true,
         logging: false,
     }),
     inject: [ConfigService],
