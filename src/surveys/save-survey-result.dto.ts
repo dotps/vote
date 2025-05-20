@@ -22,7 +22,7 @@ export class SaveQuestionResultDto implements IQuestionDto {
     id: number
 
     @IsArray()
-    @ArrayMinSize(1) // TODO: неиросеть при тестах добавила проверить на что влияет
+    @ArrayMinSize(1)
     @ValidateNested({each: true})
     @Type(() => SaveAnswerResultDto)
     @ApiProperty({
