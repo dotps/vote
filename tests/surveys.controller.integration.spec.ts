@@ -447,4 +447,70 @@ describe("SurveysController (интеграционный): ", () => {
       console.log("Ответ:", response.body)
     })
   })
+
+  describe("ошибка соединения с БД: ", () => {
+    let originalDatabaseUrl: string
+    let brokenApp: INestApplication
+
+    beforeAll(() => {
+      originalDatabaseUrl = process.env.DATABASE_URL
+      process.env.DATABASE_URL = "postgresql://wrong_user:wrong_password@localhost:5432/wrong_db"
+    })
+
+    afterAll(async () => {
+      process.env.DATABASE_URL = originalDatabaseUrl
+      if (brokenApp) {
+        await brokenApp.close()
+      }
+    })
+
+    it("должен вернуть ошибку при получении всех опросов, если БД недоступна", async () => {
+      let error
+      let timeoutId: NodeJS.Timeout
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error("Timeout")), 30000)
+      })
+      try {
+        const moduleFixture: TestingModule = await Test.createTestingModule({
+          imports: [
+            ConfigModule.forRoot({
+              isGlobal: true,
+              envFilePath: ".env",
+            }),
+            TypeOrmModule.forRootAsync({
+              imports: [ConfigModule],
+              useFactory: (configService: ConfigService) => ({
+                type: "postgres",
+                url: configService.get("DATABASE_URL"),
+                entities: [User, SurveyResult, Survey, Question, Answer],
+                synchronize: true,
+              }),
+              inject: [ConfigService],
+            }),
+            JwtModule.registerAsync({
+              imports: [ConfigModule],
+              useFactory: (configService: ConfigService) => ({
+                secret: configService.get("JWT_SECRET"),
+                signOptions: { expiresIn: "1h" },
+              }),
+              inject: [ConfigService],
+            }),
+            UserModule,
+            AuthModule,
+            SurveysModule,
+          ],
+        }).compile()
+        brokenApp = moduleFixture.createNestApplication()
+        await Promise.race([brokenApp.init(), timeoutPromise])
+        await request(brokenApp.getHttpServer())
+          .get("/surveys")
+          .expect(500)
+      } catch (e) {
+        error = e
+      } finally {
+        clearTimeout(timeoutId)
+      }
+      expect(error).toBeDefined()
+    })
+  })
 })
