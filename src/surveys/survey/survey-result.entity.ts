@@ -4,14 +4,11 @@ import {User} from "../../users/user.entity"
 import {Question} from "../question/question.entity"
 import {Answer} from "../answer/answer.entity"
 import {ApiProperty} from "@nestjs/swagger"
+import {BaseEntity} from "../base.entity"
 
 @Entity()
 @Unique(["userId", "surveyId", "questionId"]) // запрет на уровне БД для повторных ответов
-export class SurveyResult {
-    @PrimaryGeneratedColumn()
-    @ApiProperty({description: "ID"})
-    id: number
-
+export class SurveyResult extends BaseEntity {
     @Column()
     @ApiProperty({description: "ID опроса"})
     surveyId: number
@@ -39,12 +36,4 @@ export class SurveyResult {
 
     @ManyToOne(() => Answer, (answer) => answer.results)
     answer: Answer
-
-    @CreateDateColumn()
-    @ApiProperty({description: "Дата создания"})
-    createdAt: Date
-
-    @UpdateDateColumn()
-    @ApiProperty({description: "Дата обновления"})
-    updatedAt: Date
 }

@@ -1,15 +1,12 @@
-import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn} from "typeorm"
+import {Entity, Column, ManyToOne, OneToMany} from "typeorm"
 import {Survey} from "../survey/survey.entity"
 import {Answer} from "../answer/answer.entity"
 import {SurveyResult} from "../survey/survey-result.entity"
 import {ApiProperty} from "@nestjs/swagger"
+import {BaseEntity} from "../base.entity"
 
 @Entity()
-export class Question {
-    @PrimaryGeneratedColumn()
-    @ApiProperty({description: "ID"})
-    id: number
-
+export class Question extends BaseEntity {
     @Column()
     @ApiProperty({description: "Заголовок"})
     title: string
@@ -33,12 +30,4 @@ export class Question {
 
     @OneToMany(() => SurveyResult, (result) => result.question)
     results: SurveyResult[]
-
-    @CreateDateColumn()
-    @ApiProperty({description: "Дата создания"})
-    createdAt: Date
-
-    @UpdateDateColumn()
-    @ApiProperty({description: "Дата обновления"})
-    updatedAt: Date
 }

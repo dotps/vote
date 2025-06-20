@@ -2,13 +2,10 @@ import {Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn, Upd
 import {Question} from "../question/question.entity"
 import {SurveyResult} from "./survey-result.entity"
 import {ApiProperty} from "@nestjs/swagger"
+import {BaseEntity} from "../base.entity"
 
 @Entity()
-export class Survey {
-    @PrimaryGeneratedColumn()
-    @ApiProperty({description: "ID"})
-    id: number
-
+export class Survey extends BaseEntity {
     @Column()
     @ApiProperty({description: "Заголовок"})
     title: string
@@ -27,14 +24,6 @@ export class Survey {
         type: () => Question,
     })
     questions: Question[]
-
-    @CreateDateColumn()
-    @ApiProperty({description: "Дата создания"})
-    createdAt: Date
-
-    @UpdateDateColumn()
-    @ApiProperty({description: "Дата обновления"})
-    updatedAt: Date
 
     @OneToMany(() => SurveyResult, (result) => result.survey)
     results: SurveyResult[]
