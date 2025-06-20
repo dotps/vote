@@ -4,7 +4,7 @@ import {Repository} from "typeorm"
 import {CreateAnswerDto} from "./create-survey.dto"
 import {Answer} from "./answer.entity"
 import {Question} from "./question.entity"
-import {DBError} from "../errors/DBError"
+import {DbError} from "../errors/db-error"
 import {UpdateAnswerDto} from "./update-survey.dto"
 import {User} from "../users/user.entity"
 
@@ -33,7 +33,7 @@ export class AnswersService {
         try {
             return await this.answerRepository.save(answer)
         } catch (error) {
-            DBError.handle(error)
+            DbError.handle(error)
         }
     }
 

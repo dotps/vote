@@ -14,12 +14,12 @@ import {UserService} from "./user.service"
 import {User} from "./user.entity"
 import {UserDto} from "./user.dto"
 import {Public} from "../auth/public.decorator"
-import {ValidationGroup} from "../validation/ValidationGroup"
 import {AuthDto} from "../auth/auth.dto"
 import {CurrentUser} from "./current-user.decorator"
 import {ErrorsMessages} from "../errors/errors"
 import {ApiTags} from "@nestjs/swagger"
 import {ApiCreateUser, ApiPartialUpdateUser, ApiUpdateUser} from "../swagger.decorator"
+import {ValidationGroup} from "../validation/validation-group"
 
 @Controller("users")
 @ApiTags("users")

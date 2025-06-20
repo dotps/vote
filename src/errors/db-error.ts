@@ -1,6 +1,6 @@
 import {BadRequestException} from "@nestjs/common"
 
-export class DBError {
+export class DbError {
     static handle(error: any) {
         const code: string = error?.code?.toString() || ""
         if (!code || !errors[code]) throw error

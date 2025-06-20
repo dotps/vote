@@ -5,7 +5,7 @@ import {Survey} from "./survey.entity"
 import {CreateSurveyDto} from "./create-survey.dto"
 import {SaveQuestionResultDto, SaveSurveyResultDto} from "./save-survey-result.dto"
 import {SurveyResult} from "./survey-result.entity"
-import {DBError} from "../errors/DBError"
+import {DbError} from "../errors/db-error"
 import {ISurveyDto} from "./survey.dto"
 import {Errors, ErrorsMessages} from "../errors/errors"
 import {Responses, ResponseUpdateDto} from "../responses/Responses"
@@ -76,7 +76,7 @@ export class SurveysService {
                     const result = await this.resultRepository.save(surveyResult)
                     savedResults.push(result)
                 } catch (error) {
-                    DBError.handle(error)
+                    DbError.handle(error)
                 }
             }
         }

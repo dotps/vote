@@ -9,8 +9,8 @@ import {SurveyResult} from "./surveys/survey-result.entity"
 import {User} from "./users/user.entity"
 import {UpdateSurveyDto, UpdateSurveyStatusDto} from "./surveys/update-survey.dto"
 import {Answer} from "./surveys/answer.entity"
-import {ResponseUpdateDto} from "./responses/Responses"
 import {SurveyResultResponseDto} from "./surveys/survey-result-response.dto"
+import {ResponseUpdateDto} from "./responses/responses"
 
 export function ApiCreateUser() {
     return applyDecorators(

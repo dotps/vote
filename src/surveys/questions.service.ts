@@ -3,7 +3,7 @@ import {InjectRepository} from "@nestjs/typeorm"
 import {Repository} from "typeorm"
 import {CreateQuestionDto} from "./create-survey.dto"
 import {Question} from "./question.entity"
-import {DBError} from "../errors/DBError"
+import {DbError} from "../errors/db-error"
 import {Survey} from "./survey.entity"
 import {Errors, ErrorsMessages} from "../errors/errors"
 import {UpdateQuestionDto} from "./update-survey.dto"
@@ -31,7 +31,7 @@ export class QuestionsService {
         try {
             return await this.questionRepository.save(question)
         } catch (error) {
-            DBError.handle(error)
+            DbError.handle(error)
         }
     }
 
@@ -51,7 +51,7 @@ export class QuestionsService {
         try {
             return await this.questionRepository.update(questionDto.id, questionDto)
         } catch (error) {
-            DBError.handle(error)
+            DbError.handle(error)
         }
     }
 

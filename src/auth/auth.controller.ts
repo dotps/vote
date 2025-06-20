@@ -11,12 +11,12 @@ import {
 import {AuthService} from "./auth.service"
 import {UserDto} from "../users/user.dto"
 import {Public} from "./public.decorator"
-import {ValidationGroup} from "../validation/ValidationGroup"
 import {CurrentUser} from "../users/current-user.decorator"
 import {User} from "../users/user.entity"
 import {ApiTags} from "@nestjs/swagger"
 import {ApiAuthLogin, ApiAuthProfile} from "../swagger.decorator"
 import {AuthDto} from "./auth.dto"
+import {ValidationGroup} from "../validation/validation-group"
 
 @Controller("auth")
 @ApiTags("auth")

@@ -3,8 +3,8 @@ import {AppModule} from "./app.module"
 import {ValidationPipe} from "@nestjs/common"
 import {ConfigService} from "@nestjs/config"
 import {Config} from "./config/config"
-import {SimpleLogger} from "./errors/SimpleLogger"
 import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger"
+import {SimpleLogger} from "./errors/simple-logger"
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule)
