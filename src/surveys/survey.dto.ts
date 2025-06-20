@@ -3,7 +3,6 @@ export interface ISurveyDto {
     description?: string
     enabled?: boolean
     questions: IQuestionDto[]
-    // createdBy: number
 }
 
 export interface IQuestionDto {

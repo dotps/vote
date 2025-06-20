@@ -4,8 +4,10 @@ export class DbError {
     static handle(error: any) {
         const code: string = error?.code?.toString() || ""
         if (!code || !errors[code]) throw error
+
         const exceptionMethod = errors[code].exception || BadRequestException
         const message = errors[code].message || null
+
         throw new exceptionMethod(message)
     }
 }

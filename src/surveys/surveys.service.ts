@@ -8,11 +8,11 @@ import {SurveyResult} from "./survey-result.entity"
 import {DbError} from "../errors/db-error"
 import {ISurveyDto} from "./survey.dto"
 import {Errors, ErrorsMessages} from "../errors/errors"
-import {Responses, ResponseUpdateDto} from "../responses/Responses"
 import {UpdateSurveyDto} from "./update-survey.dto"
 import {User} from "../users/user.entity"
 import {SurveyResultResponseDto} from "./survey-result-response.dto"
 import {UpdateSurveysService} from "./update-surveys.service"
+import {Responses, ResponseUpdateDto} from "../responses/responses"
 
 @Injectable()
 export class SurveysService {
@@ -36,7 +36,9 @@ export class SurveysService {
         const surveys = await this.surveyRepository.find({
             where: {enabled: true}
         })
+
         if (surveys.length === 0) throw new NotFoundException(ErrorsMessages.SurveyNotFound)
+
         return surveys
     }
 
@@ -49,14 +51,18 @@ export class SurveysService {
             },
             relations: relations,
         })
+
         if (!survey) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.SurveyNotFound)
+
         return survey
     }
 
     async saveUserSurveyResult(user: User, surveyId: number, data: SaveSurveyResultDto): Promise<SurveyResult[]> {
         const survey = await this.getSurvey(surveyId, {isExcludeRelations: true, enabled: true})
         if (!survey) throw new NotFoundException(Errors.displayId(surveyId) + ErrorsMessages.SurveyNotFound)
+
         if (data.questions.length === 0) throw new BadRequestException(ErrorsMessages.QuestionsNotEmpty)
+
         return await this.saveSurveyResult(user.id, surveyId, data.questions)
     }
 
@@ -114,6 +120,7 @@ export class SurveysService {
         if (!user.isSelf(survey?.createdBy)) throw new ForbiddenException(ErrorsMessages.SurveyUpdateForbidden)
 
         this.updateSurveysService.updateSurvey(survey, surveyDto)
+
         return await this.surveyRepository.save(survey)
     }
 
@@ -126,6 +133,7 @@ export class SurveysService {
         })
 
         const result = await this.surveyRepository.update(surveyId, surveyForUpdate)
+
         return Responses.update(result)
     }
 }

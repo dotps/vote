@@ -22,7 +22,6 @@ import {Answer} from "./answer.entity"
 import {AnswersService} from "./answers.service"
 import {CurrentUser} from "../users/current-user.decorator"
 import {User} from "../users/user.entity"
-import {ResponseUpdateDto} from "../responses/Responses"
 import {UpdateAnswerDto, UpdateSurveyDto, UpdateSurveyStatusDto} from "./update-survey.dto"
 import {
     ApiCreateAnswer,
@@ -34,6 +33,7 @@ import {
 } from "../swagger.decorator"
 import {ApiBearerAuth, ApiResponse, ApiTags} from "@nestjs/swagger"
 import {SurveyResultResponseDto} from "./survey-result-response.dto"
+import {ResponseUpdateDto} from "../responses/responses"
 
 @Controller("surveys")
 @ApiTags("surveys")

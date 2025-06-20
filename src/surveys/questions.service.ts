@@ -40,6 +40,7 @@ export class QuestionsService {
             select: ["createdBy"],
             where: {id: surveyId}
         })
+
         if (!survey) throw new NotFoundException(Errors.displayId(surveyId) + ErrorsMessages.SurveyNotFound)
         if (!user.isSelf(survey?.createdBy)) throw new ForbiddenException(ErrorsMessages.QuestionAddForbidden)
     }

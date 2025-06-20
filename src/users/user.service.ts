@@ -21,24 +21,28 @@ export class UserService {
         let user = this.repository.create(data)
         user = await this.repository.save(user)
         const token = await this.tokenService.generateToken(user)
+
         return new AuthDto(user, token)
     }
 
     async getUser(id: number): Promise<User> {
         const user = await this.repository.findOneBy({id})
         if (!user) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.UserNotFound)
+
         return user
     }
 
     async getUserByName(name: string): Promise<User> {
         const user = await this.repository.findOneBy({name: name.trim()})
         if (!user) throw new NotFoundException(ErrorsMessages.UserNotFound)
+
         return user
     }
 
     async updateUser(id: number, data: UserDto): Promise<User> {
         const result = await this.repository.update(id, data)
         if (!result.affected) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.NotFound)
+
         return await this.getUser(id)
     }
 

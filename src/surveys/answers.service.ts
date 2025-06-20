@@ -56,6 +56,7 @@ export class AnswersService {
     createAnswerObjectFromDto(answerDto: CreateAnswerDto | UpdateAnswerDto): Answer {
         const answer = new Answer()
         this.updateAnswerObjectFromDto(answer, answerDto)
+
         return answer
     }
 

@@ -18,6 +18,7 @@ export class UpdateSurveysService {
 
     updateSurvey(survey: Survey, surveyDto: UpdateSurveyDto) {
         const {questions: questionsDto, ...surveyFields} = surveyDto
+
         this.updateSurveyFields(survey, surveyFields)
         this.updateQuestionsInSurvey(survey.questions, questionsDto)
     }
@@ -30,12 +31,14 @@ export class UpdateSurveysService {
         for (const questionDto of questionsDto) {
             if (questionDto.id) {
                 const question = this.updateQuestion(questions, questionDto)
+
                 for (const answerDto of questionDto.answers) {
                     if (answerDto.id) this.updateAnswer(question.answers, answerDto)
                     else this.createAnswerAndAddToQuestion(answerDto, question)
                 }
             } else {
                 const question = this.createQuestionFromDtoWithoutAnswers(questionDto)
+
                 for (const answerDto of questionDto.answers) {
                     this.createAnswerAndAddToQuestion(answerDto, question)
                 }
@@ -51,22 +54,28 @@ export class UpdateSurveysService {
 
     private createQuestionFromDtoWithoutAnswers(questionDto: UpdateQuestionDto): Question {
         const question = new Question()
+
         this.questionsService.updateQuestionObjectFromDto(question, questionDto)
         question.answers = []
+
         return question
     }
 
     private updateAnswer(answers: Answer[], answerDto: UpdateAnswerDto): Answer {
         const answer = answers.find(a => a.id === answerDto.id)
         if (!answer) throw new NotFoundException(Errors.displayId(answerDto.id) + ErrorsMessages.AnswerNotFound)
+
         this.answersService.updateAnswerObjectFromDto(answer, answerDto)
+
         return answer
     }
 
     private updateQuestion(questions: Question[], questionDto: UpdateQuestionDto): Question {
         const question = questions.find(q => q.id === questionDto.id)
         if (!question) throw new NotFoundException(Errors.displayId(questionDto.id) + ErrorsMessages.QuestionNotFound)
+
         this.questionsService.updateQuestionObjectFromDto(question, questionDto)
+
         return question
     }
 }

@@ -16,7 +16,9 @@ export class AuthService {
     async signIn(username: string, password: string): Promise<AuthDto> {
         const user = await this.userService.getUserByName(username)
         if (user?.password !== password) throw new UnauthorizedException(ErrorsMessages.AuthWrongData)
+
         const token = await this.tokenService.generateToken(user)
+
         return new AuthDto(user, token)
     }
 }
