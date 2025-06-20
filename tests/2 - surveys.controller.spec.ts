@@ -9,7 +9,7 @@ import {ForbiddenException, ValidationPipe, BadRequestException} from "@nestjs/c
 import {User} from "../src/users/user.entity"
 import {SurveyResult} from "../src/surveys/survey/survey-result.entity"
 import {SurveyResultResponseDto} from "../src/surveys/survey/dto/survey-result-response.dto"
-import {ResponseUpdateDto} from "../src/responses/Responses"
+import {ResponseUpdateDto} from "../src/responses/responses"
 import {Answer} from "../src/surveys/answer/answer.entity"
 import {CreateAnswerDto} from "../src/surveys/survey/dto/create-survey.dto"
 import {SaveSurveyResultDto} from "../src/surveys/survey/dto/save-survey-result.dto"

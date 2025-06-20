@@ -1,6 +1,6 @@
 import {IsEmail, IsNotEmpty, IsOptional, IsString} from "class-validator"
 import {ApiProperty} from "@nestjs/swagger"
-import { ValidationGroup } from "src/validation/validation-group"
+import {ValidationGroup} from "src/validation/validation-group"
 
 export class UserDto {
     @IsNotEmpty({groups: [ValidationGroup.Create, ValidationGroup.Update, ValidationGroup.Auth]})
