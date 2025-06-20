@@ -1,10 +1,10 @@
 import {Injectable, NotFoundException} from "@nestjs/common"
-import {Question} from "./question.entity"
-import {Answer} from "./answer.entity"
-import {AnswersService} from "./answers.service"
-import {QuestionsService} from "./questions.service"
-import {Errors, ErrorsMessages} from "../errors/errors"
-import {UpdateAnswerDto, UpdateQuestionDto, UpdateSurveyDto} from "./update-survey.dto"
+import {Question} from "../question/question.entity"
+import {Answer} from "../answer/answer.entity"
+import {AnswersService} from "../answer/answers.service"
+import {QuestionsService} from "../question/questions.service"
+import {Errors, ErrorsMessages} from "../../errors/errors"
+import {UpdateAnswerDto, UpdateQuestionDto, UpdateSurveyDto} from "./dto/update-survey.dto"
 import {Survey} from "./survey.entity"
 
 @Injectable()

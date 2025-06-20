@@ -12,17 +12,17 @@ import {
 } from "@nestjs/common"
 import {SurveysService} from "./surveys.service"
 import {Survey} from "./survey.entity"
-import {SaveSurveyResultDto} from "./save-survey-result.dto"
+import {SaveSurveyResultDto} from "./dto/save-survey-result.dto"
 import {
     CreateAnswerDto,
     CreateSurveyDto,
-} from "./create-survey.dto"
+} from "./dto/create-survey.dto"
 import {SurveyResult} from "./survey-result.entity"
-import {Answer} from "./answer.entity"
-import {AnswersService} from "./answers.service"
-import {CurrentUser} from "../users/current-user.decorator"
-import {User} from "../users/user.entity"
-import {UpdateAnswerDto, UpdateSurveyDto, UpdateSurveyStatusDto} from "./update-survey.dto"
+import {Answer} from "../answer/answer.entity"
+import {AnswersService} from "../answer/answers.service"
+import {CurrentUser} from "../../users/current-user.decorator"
+import {User} from "../../users/user.entity"
+import {UpdateAnswerDto, UpdateSurveyDto, UpdateSurveyStatusDto} from "./dto/update-survey.dto"
 import {
     ApiCreateAnswer,
     ApiCreateSurvey,
@@ -30,10 +30,10 @@ import {
     ApiGetSurvey,
     ApiGetSurveyResult,
     ApiSaveSurveyResult, ApiSetSurveyActive, ApiUpdateAnswer, ApiUpdateSurvey,
-} from "../swagger.decorator"
+} from "../../swagger.decorator"
 import {ApiBearerAuth, ApiResponse, ApiTags} from "@nestjs/swagger"
-import {SurveyResultResponseDto} from "./survey-result-response.dto"
-import {ResponseUpdateDto} from "../responses/responses"
+import {SurveyResultResponseDto} from "./dto/survey-result-response.dto"
+import {ResponseUpdateDto} from "../../responses/responses"
 
 @Controller("surveys")
 @ApiTags("surveys")

@@ -8,8 +8,8 @@ import {
     CreateDateColumn,
     UpdateDateColumn
 } from "typeorm"
-import {Question} from "./question.entity"
-import {SurveyResult} from "./survey-result.entity"
+import {Question} from "../question/question.entity"
+import {SurveyResult} from "../survey/survey-result.entity"
 import {ApiProperty} from "@nestjs/swagger"
 
 @Entity()

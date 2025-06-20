@@ -1,7 +1,7 @@
 import {Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn} from "typeorm"
-import {Survey} from "./survey.entity"
-import {Answer} from "./answer.entity"
-import {SurveyResult} from "./survey-result.entity"
+import {Survey} from "../survey/survey.entity"
+import {Answer} from "../answer/answer.entity"
+import {SurveyResult} from "../survey/survey-result.entity"
 import {ApiProperty} from "@nestjs/swagger"
 
 @Entity()

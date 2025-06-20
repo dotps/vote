@@ -1,5 +1,5 @@
 import {Entity, Column, PrimaryGeneratedColumn, OneToMany} from "typeorm"
-import {SurveyResult} from "../surveys/survey-result.entity"
+import {SurveyResult} from "../surveys/survey/survey-result.entity"
 import {ApiProperty} from "@nestjs/swagger"
 
 @Entity()
