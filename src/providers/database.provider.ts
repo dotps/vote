@@ -10,7 +10,7 @@ import {SurveyResult} from "../surveys/survey-result.entity"
 export const databaseProvider = TypeOrmModule.forRootAsync({
     useFactory: (configService: ConfigService) => ({
         type: "postgres",
-        url: configService.get<string>(Config.DATABASE_URL),
+        url: configService.get<string>(Config.DatabaseUrl),
         entities: [User, Survey, Question, Answer, SurveyResult],
         synchronize: true,
         logging: false,

@@ -26,19 +26,19 @@ export class UserService {
 
     async getUser(id: number): Promise<User> {
         const user = await this.repository.findOneBy({id})
-        if (!user) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.USER_NOT_FOUND)
+        if (!user) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.UserNotFound)
         return user
     }
 
     async getUserByName(name: string): Promise<User> {
         const user = await this.repository.findOneBy({name: name.trim()})
-        if (!user) throw new NotFoundException(ErrorsMessages.USER_NOT_FOUND)
+        if (!user) throw new NotFoundException(ErrorsMessages.UserNotFound)
         return user
     }
 
     async updateUser(id: number, data: UserDto): Promise<User> {
         const result = await this.repository.update(id, data)
-        if (!result.affected) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.NOT_FOUND)
+        if (!result.affected) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.NotFound)
         return await this.getUser(id)
     }
 
@@ -48,6 +48,6 @@ export class UserService {
 
     async deleteUser(id: number): Promise<void> {
         const result = await this.repository.delete(id)
-        if (!result.affected) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.NOT_FOUND)
+        if (!result.affected) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.NotFound)
     }
 }

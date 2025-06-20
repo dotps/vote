@@ -40,8 +40,8 @@ export class QuestionsService {
             select: ["createdBy"],
             where: {id: surveyId}
         })
-        if (!survey) throw new NotFoundException(Errors.displayId(surveyId) + ErrorsMessages.SURVEY_NOT_FOUND)
-        if (!user.isSelf(survey?.createdBy)) throw new ForbiddenException(ErrorsMessages.QUESTION_ADD_FORBIDDEN)
+        if (!survey) throw new NotFoundException(Errors.displayId(surveyId) + ErrorsMessages.SurveyNotFound)
+        if (!user.isSelf(survey?.createdBy)) throw new ForbiddenException(ErrorsMessages.QuestionAddForbidden)
     }
 
     async updateQuestion(user: User, surveyId: number, questionDto: UpdateQuestionDto, checkCanUserCreateQuestion: boolean = false) {

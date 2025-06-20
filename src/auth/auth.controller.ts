@@ -28,7 +28,7 @@ export class AuthController {
     @Public()
     @HttpCode(HttpStatus.OK)
     @Post("login")
-    @UsePipes(new ValidationPipe({groups: [ValidationGroup.AUTH]}))
+    @UsePipes(new ValidationPipe({groups: [ValidationGroup.Auth]}))
     @ApiAuthLogin()
     signIn(@Body() user: UserDto): Promise<AuthDto> {
         return this.authService.signIn(user.name, user.password)

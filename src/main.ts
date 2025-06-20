@@ -13,7 +13,7 @@ async function bootstrap() {
     app.useLogger(new SimpleLogger(true))
 
     const configService = app.get(ConfigService)
-    const port = configService.get<string>(Config.APP_PORT)
+    const port = configService.get<string>(Config.AppPort)
 
     const configSwagger = new DocumentBuilder()
         .setTitle("Survey API")

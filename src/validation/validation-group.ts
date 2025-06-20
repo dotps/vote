@@ -1,7 +1,7 @@
 export enum ValidationGroup {
-    AUTH = "AUTH",
-    CREATE = "CREATE",
-    UPDATE = "UPDATE",
-    PARTIAL_UPDATE = "PARTIAL_UPDATE",
-    SURVEY_SAVE_RESPONSE = "SURVEY_SAVE_RESPONSE",
+    Auth = "AUTH",
+    Create = "CREATE",
+    Update = "UPDATE",
+    PartialUpdate = "PARTIAL_UPDATE",
+    SurveySaveResponse = "SURVEY_SAVE_RESPONSE",
 }

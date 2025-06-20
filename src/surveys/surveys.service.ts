@@ -36,7 +36,7 @@ export class SurveysService {
         const surveys = await this.surveyRepository.find({
             where: {enabled: true}
         })
-        if (surveys.length === 0) throw new NotFoundException(ErrorsMessages.SURVEY_NOT_FOUND)
+        if (surveys.length === 0) throw new NotFoundException(ErrorsMessages.SurveyNotFound)
         return surveys
     }
 
@@ -49,21 +49,21 @@ export class SurveysService {
             },
             relations: relations,
         })
-        if (!survey) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.SURVEY_NOT_FOUND)
+        if (!survey) throw new NotFoundException(Errors.displayId(id) + ErrorsMessages.SurveyNotFound)
         return survey
     }
 
     async saveUserSurveyResult(user: User, surveyId: number, data: SaveSurveyResultDto): Promise<SurveyResult[]> {
         const survey = await this.getSurvey(surveyId, {isExcludeRelations: true, enabled: true})
-        if (!survey) throw new NotFoundException(Errors.displayId(surveyId) + ErrorsMessages.SURVEY_NOT_FOUND)
-        if (data.questions.length === 0) throw new BadRequestException(ErrorsMessages.QUESTIONS_NOT_EMPTY)
+        if (!survey) throw new NotFoundException(Errors.displayId(surveyId) + ErrorsMessages.SurveyNotFound)
+        if (data.questions.length === 0) throw new BadRequestException(ErrorsMessages.QuestionsNotEmpty)
         return await this.saveSurveyResult(user.id, surveyId, data.questions)
     }
 
     private async saveSurveyResult(userId: number, surveyId: number, questions: SaveQuestionResultDto[]): Promise<SurveyResult[]> {
         const savedResults: SurveyResult[] = []
         for (const question of questions) {
-            if (question.answers.length === 0) throw new BadRequestException(ErrorsMessages.ANSWERS_NOT_EMPTY)
+            if (question.answers.length === 0) throw new BadRequestException(ErrorsMessages.AnswersNotEmpty)
 
             for (const answer of question.answers) {
                 try {
@@ -101,7 +101,7 @@ export class SurveysService {
             .orderBy("question.id, answer.id")
             .getRawMany()
 
-        if (!results || results.length === 0) throw new NotFoundException(ErrorsMessages.SURVEY_RESULTS_NOT_FOUND)
+        if (!results || results.length === 0) throw new NotFoundException(ErrorsMessages.SurveyResultsNotFound)
         return results as SurveyResultResponseDto[]
     }
 
@@ -111,7 +111,7 @@ export class SurveysService {
 
     async updateSurvey(surveyDto: UpdateSurveyDto, user: User, surveyId: number): Promise<Survey> {
         const survey = await this.getSurvey(surveyId)
-        if (!user.isSelf(survey?.createdBy)) throw new ForbiddenException(ErrorsMessages.SURVEY_UPDATE_FORBIDDEN)
+        if (!user.isSelf(survey?.createdBy)) throw new ForbiddenException(ErrorsMessages.SurveyUpdateForbidden)
 
         this.updateSurveysService.updateSurvey(survey, surveyDto)
         return await this.surveyRepository.save(survey)
@@ -119,7 +119,7 @@ export class SurveysService {
 
     async setSurveyActive(user: User, surveyId: number, enabled: boolean): Promise<ResponseUpdateDto> {
         const survey = await this.getSurvey(surveyId, {isExcludeRelations: true})
-        if (!user.isSelf(survey?.createdBy)) throw new ForbiddenException(ErrorsMessages.SURVEY_UPDATE_FORBIDDEN)
+        if (!user.isSelf(survey?.createdBy)) throw new ForbiddenException(ErrorsMessages.SurveyUpdateForbidden)
 
         const surveyForUpdate = this.surveyRepository.create({
             enabled: enabled,

@@ -30,33 +30,33 @@ export class UserController {
 
     @Public()
     @Post()
-    @UsePipes(new ValidationPipe({groups: [ValidationGroup.CREATE]}))
+    @UsePipes(new ValidationPipe({groups: [ValidationGroup.Create]}))
     @ApiCreateUser()
     async create(@Body() data: UserDto): Promise<AuthDto> {
         return await this.userService.createUser(data)
     }
 
     @Put(":id")
-    @UsePipes(new ValidationPipe({groups: [ValidationGroup.UPDATE]}))
+    @UsePipes(new ValidationPipe({groups: [ValidationGroup.Update]}))
     @ApiUpdateUser()
     async update(
         @Param("id", ParseIntPipe) id: number,
         @Body() data: UserDto,
         @CurrentUser() user: User,
     ): Promise<User> {
-        if (!user.isSelf(id)) throw new ForbiddenException(ErrorsMessages.USER_UPDATE_FORBIDDEN)
+        if (!user.isSelf(id)) throw new ForbiddenException(ErrorsMessages.UserUpdateForbidden)
         return this.userService.updateUser(id, data)
     }
 
     @Patch(":id")
-    @UsePipes(new ValidationPipe({groups: [ValidationGroup.PARTIAL_UPDATE]}))
+    @UsePipes(new ValidationPipe({groups: [ValidationGroup.PartialUpdate]}))
     @ApiPartialUpdateUser()
     async partialUpdate(
         @Param("id", ParseIntPipe) id: number,
         @Body() data: UserDto,
         @CurrentUser() user: User,
     ): Promise<User> {
-        if (!user.isSelf(id)) throw new ForbiddenException(ErrorsMessages.USER_UPDATE_FORBIDDEN)
+        if (!user.isSelf(id)) throw new ForbiddenException(ErrorsMessages.UserUpdateForbidden)
         return this.userService.updateUser(id, data)
     }
 }

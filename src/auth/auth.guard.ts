@@ -21,7 +21,7 @@ export class AuthGuard implements CanActivate {
 
         const request = context.switchToHttp().getRequest()
         const token = this.getTokenFromHeader(request)
-        if (!token) throw new UnauthorizedException(ErrorsMessages.AUTH_TOKEN_NOT_FOUND)
+        if (!token) throw new UnauthorizedException(ErrorsMessages.AuthTokenNotFound)
 
         try {
             const userId = await this.getUserIdFromToken(token)
@@ -42,7 +42,7 @@ export class AuthGuard implements CanActivate {
     async getUserIdFromToken(token: string): Promise<number> {
         const decodedToken = await this.tokenService.verifyToken(token)
         const userId = Number(decodedToken.sub) || undefined
-        if (!userId) throw new UnauthorizedException(ErrorsMessages.AUTH_TOKEN_USER_NOT_FOUND)
+        if (!userId) throw new UnauthorizedException(ErrorsMessages.AuthTokenUserNotFound)
         return userId
     }
 

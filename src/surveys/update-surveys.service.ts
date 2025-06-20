@@ -58,14 +58,14 @@ export class UpdateSurveysService {
 
     private updateAnswer(answers: Answer[], answerDto: UpdateAnswerDto): Answer {
         const answer = answers.find(a => a.id === answerDto.id)
-        if (!answer) throw new NotFoundException(Errors.displayId(answerDto.id) + ErrorsMessages.ANSWER_NOT_FOUND)
+        if (!answer) throw new NotFoundException(Errors.displayId(answerDto.id) + ErrorsMessages.AnswerNotFound)
         this.answersService.updateAnswerObjectFromDto(answer, answerDto)
         return answer
     }
 
     private updateQuestion(questions: Question[], questionDto: UpdateQuestionDto): Question {
         const question = questions.find(q => q.id === questionDto.id)
-        if (!question) throw new NotFoundException(Errors.displayId(questionDto.id) + ErrorsMessages.QUESTION_NOT_FOUND)
+        if (!question) throw new NotFoundException(Errors.displayId(questionDto.id) + ErrorsMessages.QuestionNotFound)
         this.questionsService.updateQuestionObjectFromDto(question, questionDto)
         return question
     }
